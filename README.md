@@ -113,6 +113,7 @@ ocre-jelly reads `docs/ubiquitous-language.md` or `UBIQUITOUS-LANGUAGE.md` (or t
 
 - **Module:** add `skills/ocre-jelly/modules/<name>.md` with frontmatter (`kind: rules|export`, `default: on|off|auto`, `detect` or `detect_files`, `when:`) and a body. An export module adds `target:`, and can have a `<name>.py` with `render(ctx)`.
 - **Locale:** add `skills/ocre-jelly/locales/<lang>.py` (patterns, `STOPWORDS`, `AUTHORITY`) or `<lang>-<REGION>.py` (`PARENT`, `SUMMARY`, `SPELLING_STYLE`, `PREFER`, extra `SOFT`/`HARD`).
+- Measure quality and cost with the eval suite in `evals/` (`claude plugin eval .`); see `evals/README.md`.
 - Run `./setup.sh --check` after any change. Every module and locale is loaded and checked, and the generated reference pages must be current (`skills/ocre-jelly/scripts/gen_docs.py` rewrites them).
 - Step-by-step guides: [Add a module](docs/how-to/add-a-module.md), [Add a locale](docs/how-to/add-a-locale.md).
 
