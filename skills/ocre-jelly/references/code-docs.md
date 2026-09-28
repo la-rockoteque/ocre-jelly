@@ -47,3 +47,20 @@ Doc generators leave stubs that are always findings:
 - Document This and IDE stubs: `@param {*} name`, and tag lines with no text (`@param id`, `@return`).
 
 Fix a placeholder by writing the real text (rules 1 to 4), or by deleting the comment when rule 2 allows it. Remove the generator's marker in the same edit. The doc-convention modules (`modules.py list`) add opinions for each format and generator.
+
+## Running docs mode
+
+For `docs` mode, and whenever the user asks to review or fix comments or doc comments in source files:
+
+1. Read [references/code-docs.md](code-docs.md), and follow the active doc-convention modules (`modules.py rules`).
+2. Scan the files the user named. For a folder, list its source files first and confirm the list with the user if it has more than 20 files:
+   ```bash
+   python3 <this-skill-dir>/scripts/codedoc.py FILE [FILE ...]
+   ```
+   It scans only the prose of comments, and the user-facing values of string resources (i18n JSON, `.po`, `.resx`, `.properties`, `.strings`, `.xlf`), with placeholders like `{{count}}` masked. Files under `ignore_paths` are skipped. Tags, types, parameter names, XML elements and code examples are masked. It adds the doc checks `echo-doc`, `param-echo`, `returns-echo`, `generated-doc` and `this-method` to the prose checks.
+3. Classify each candidate as in Pass 1. In audit mode, report with `<file>:L<line>:` lines.
+4. In rewrite mode, edit comment text only, then verify that the code didn't change:
+   ```bash
+   python3 <this-skill-dir>/scripts/codedoc.py --same-code original.ext rewritten.ext
+   ```
+   Keep a copy of each original in a scratch directory for this check. Any answer except `code unchanged` blocks: undo the edit.
