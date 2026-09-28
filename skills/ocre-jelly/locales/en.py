@@ -63,3 +63,9 @@ SPELLING = [
     ("misc", "plow", "plough"), ("misc", "skeptic", "sceptic"), ]
 # ponytail: word lists, not suffix rules. Pairs whose other spelling is also a valid
 # word (emphasis, check, tire, program, enrolled) are left out; every spelling hit is soft.
+
+# Register: "neutral" is the base. "formal" adds soft checks for informal markers.
+REGISTER = {
+    "casual": {"off": []},
+    "formal": {"SOFT": {"register-informal": r"\b\w+n't\b|\b(?:it|that|there|what|let)'s\b|\b(?:I|you|we|they)'(?:re|ve|ll|d|m)\b|\b(?:gonna|wanna|kinda|gotta)\b"}},
+}

@@ -5,7 +5,7 @@ SUMMARY = "fr-CA: OQLF usage. courriel, clavarder, fin de semaine, infonuagique,
 # Anglicisms the OQLF advises against in formal writing. Soft: register decides.
 SOFT = {
     "anglicism": (
-        rf"\b(?:cédul(?:e|er|é|ée|és|ées)|cancell(?:e|er|é|ée)|faire du sens|à l{A}effet que|"
+        rf"\b(?:cédul(?:e|er|é|ée|és|ées)|cancell(?:e|er|é|ée)|(?:faire|fait|fais|font|faisait|ferait) du sens|à l{A}effet que|"
         r"adresser (?:un|le|ce|les|des) (?:problème|enjeu)s?|en termes de|"
         r"supporter (?:le|la|les|un|une) (?:projet|équipe|client|décision)s?|"
         r"(?:au|en) meilleur de (?:ma|notre|leur) connaissance|"

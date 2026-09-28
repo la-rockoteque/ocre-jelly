@@ -316,6 +316,7 @@ def doc_hits(b: Block) -> list[dict]:
     return hits
 
 
+REGISTER = None  # set from the config in main()
 LENGTH_KEEP = 3  # per file; long comment sentences are common, so show the worst and count the rest
 
 
@@ -399,14 +400,14 @@ def parse_diff(diff: str) -> dict[str, set[int]]:
 def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None, all_hits: bool = False,
                 locales: list[str] | None = None, protected_terms: list[str] | None = None) -> list[dict]:
     if ext in PROSE:
-        hits = scan.scan(src, aliases=aliases, locales=locales, protected_terms=protected_terms)
+        hits = scan.scan(src, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)
         return sorted(hits if all_hits else condense(hits), key=lambda h: (h["line"], h["severity"]))
     if ext in STRINGS:  # each string is its own paragraph, so scan values one by one
         hits = []
         for n, value in enumerate(strings_prose(src, ext)):
             if value:
                 hits += [{**h, "line": n + 1}
-                         for h in scan.scan(value, aliases=aliases, locales=locales, protected_terms=protected_terms)]
+                         for h in scan.scan(value, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)]
         return sorted(hits if all_hits else condense(hits), key=lambda h: (h["line"], h["severity"]))
     blocks = blocks_for(src, ext)
     total = src.count("\n") + 1
@@ -416,7 +417,7 @@ def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None,
         for i, text in enumerate(masked):
             if b.start - 1 + i < total:
                 prose[b.start - 1 + i] = text
-    hits = scan.scan("\n".join(prose), aliases=aliases, locales=locales, protected_terms=protected_terms)
+    hits = scan.scan("\n".join(prose), aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)
     for b in blocks:
         hits += doc_hits(b)
     hits = scan.suppress(hits, src)  # markers in the raw source also cover doc-comment findings
@@ -647,8 +648,9 @@ def main() -> None:
         print(problem or "code unchanged")
         sys.exit(1 if problem else 0)
 
-    global LENGTH_KEEP
+    global LENGTH_KEEP, REGISTER
     cfg = scan.load_settings(args.no_config)
+    REGISTER = cfg.get("register")
     if not args.no_config:
         LENGTH_KEEP = cfg["thresholds"]["length_hits_per_file"]
     aliases = {}

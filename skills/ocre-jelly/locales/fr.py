@@ -34,3 +34,10 @@ SOFT = {
     # Wordy phrasing (langage clair): prefer the short form
     "ste-wordy": rf"\b(?:afin de|dans le cadre de|au niveau de|procéder à|effectuer une?|être en mesure de|en vue de|par le biais de|au moyen de|il y a lieu de|de (?:manière|façon) \w+|faire en sorte que|permettre de)\b",
 }
+
+# Register: "neutral" is the base. "casual" drops checks that only formality needs;
+# "formal" adds soft checks for informal markers. AI-tell checks stay on in every register.
+REGISTER = {
+    "casual": {"off": ["anglicism"]},
+    "formal": {"SOFT": {"register-informal": rf"\b(?:tu|toi|ton|ta|tes|t{A}(?=[aeiouhé]))\b|\b(?:pis|chu|faque|genre)\b"}},
+}

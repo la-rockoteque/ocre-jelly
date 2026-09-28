@@ -31,6 +31,7 @@ GLOSSARY_NAMES = ("docs/ubiquitous-language.md", "ubiquitous-language.md")
 DEFAULTS = {
     "enabled": True,
     "locales": [],                 # e.g. ["en-CA", "fr-CA"]; empty = detect en/fr, no regional checks
+    "register": None,              # "casual" | "neutral" | "formal", or per language: {"fr": "casual"}
     "glossary": None,              # path from the repo root; None = docs/ubiquitous-language.md or UBIQUITOUS-LANGUAGE.md
     "modules": {},                 # name -> on | off | auto
     "inject": "index",             # index (progressive disclosure) | full
@@ -69,7 +70,7 @@ DEFAULTS = {
     },
 }
 
-TYPES = {"enabled": bool, "locales": list, "glossary": (str, type(None)), "modules": dict, "inject": str,
+TYPES = {"enabled": bool, "locales": list, "register": (str, dict, type(None)), "glossary": (str, type(None)), "modules": dict, "inject": str,
          "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list,
          "commits": dict, "feedback": dict, "telemetry": dict, "updates": dict}
 
@@ -110,6 +111,10 @@ def validate(data: dict, where: str) -> list[str]:
     for key, value in (data.get("thresholds") or {}).items():
         if key not in DEFAULTS["thresholds"] or not isinstance(value, int) or value < 1:
             errors.append(f"{where}: thresholds.{key} must be a known key with a positive integer")
+    reg = data.get("register")
+    for key, value in (reg.items() if isinstance(reg, dict) else [("", reg)] if reg is not None else []):
+        if value not in ("formal", "neutral", "casual") or (key and not TAG_RE.match(key)):
+            errors.append(f"{where}: register must be formal, neutral or casual, or a map like {{\"fr\": \"casual\"}}")
     for tag in data.get("locales") if isinstance(data.get("locales"), list) else []:
         if not isinstance(tag, str) or not TAG_RE.match(tag):
             errors.append(f"{where}: locales entry {tag!r} must look like en, en-CA or fr-FR")
@@ -327,6 +332,8 @@ def selftest() -> None:
         update_layer("local", root, lambda d: d.pop("telemetry"))
         assert validate({"feedback": {"form_url": "http://evil"}}, "t") and validate({"feedback": {"entry": "x1"}}, "t")
         assert not validate({"feedback": {"enabled": False, "form_url": "https://f.example/form", "entry": "42"}}, "t")
+        assert not validate({"register": {"fr": "casual", "en-CA": "formal"}}, "t") and not validate({"register": "casual"}, "t")
+        assert validate({"register": "slang"}, "t") and validate({"register": {"french": "casual"}}, "t")
         assert validate({"locales": ["../../etc/passwd"]}, "t") and validate({"subagents": {"inject": "yes", "x": 1}}, "t")
         (tmp / "secret.md").write_text("s")
         assert find_glossary(root, {"glossary": "../secret.md"}) is None, "glossary escaped the repo"

@@ -158,7 +158,7 @@ def locale_line(tags: list[str]) -> str:
 
 
 def rules_text(mods: dict[str, dict], active: dict[str, tuple[bool, str]], full: bool = False,
-               locales: list[str] | None = None) -> str:
+               locales: list[str] | None = None, register=None) -> str:
     """Core rules, the locale line, then active rules modules.
 
     Progressive disclosure: by default a module contributes one index line (its
@@ -169,6 +169,10 @@ def rules_text(mods: dict[str, dict], active: dict[str, tuple[bool, str]], full:
     parts = [CORE_RULES.read_text(encoding="utf-8").strip()]
     if locales:
         parts.append(locale_line(locales))
+    if register:
+        names = ", ".join(f"{k} {v}" for k, v in register.items()) if isinstance(register, dict) else f"all languages {register}"
+        parts.append(f"Register: {names}. Write new prose in it; a rewrite keeps the source's register. "
+                     f"Rules: `{SKILL_DIR / 'references' / 'registers.md'}`.")
     index = []
     for name, m in mods.items():
         if m["kind"] != "rules" or not active[name][0] or not m["body"]:
@@ -184,7 +188,8 @@ def rules_text(mods: dict[str, dict], active: dict[str, tuple[bool, str]], full:
 
 def session_rules(root: Path, cfg: dict, full: bool = False) -> str:
     mods = all_modules()
-    return rules_text(mods, resolve(mods, root, installed_plugins()), full or cfg["inject"] == "full", cfg["locales"])
+    return rules_text(mods, resolve(mods, root, installed_plugins()), full or cfg["inject"] == "full", cfg["locales"],
+                      cfg.get("register"))
 
 
 def run_hook(event: str) -> None:
@@ -293,7 +298,7 @@ def run_export(names: list[str], glossary: str | None, dry_run: bool, force: boo
 
     gpath = Path(glossary) if glossary else config.find_glossary(root, cfg)
     md = gpath.read_text(encoding="utf-8") if gpath else ""
-    ctx = {"rules": rules_text(mods, active, full=True, locales=cfg["locales"]), "rows": scan.glossary_rows(md),
+    ctx = {"rules": rules_text(mods, active, full=True, locales=cfg["locales"], register=cfg.get("register")), "rows": scan.glossary_rows(md),
            "aliases": scan.load_glossary(md), "mark": MARK, "scripts_dir": str(HERE), "root": str(root)}
     for n in chosen:
         if exports[n].get("needs") == "glossary" and not ctx["rows"]:
@@ -406,6 +411,7 @@ def selftest() -> None:
         assert "ALPHA RULE" in rules_text(mods, act, full=True)
         text = rules_text(mods, act, locales=["en-CA", "fr-CA"])
         assert "Locales: en-CA:" in text and "fr -> " in text and "ste-fr.md" in text, text
+        assert "Register: fr casual" in rules_text(mods, act, register={"fr": "casual"})
         (mdir / "alpha.md").write_text("---\nkind: rules\ndefault: on\ninject: always\n---\nALPHA RULE\n")
         assert "ALPHA RULE" in rules_text(all_modules(mdir), act)
 

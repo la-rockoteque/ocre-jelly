@@ -149,7 +149,7 @@ def load(no_config: bool) -> tuple[dict, dict, dict]:
     import config
     cfg = scan.load_settings(no_config)
     settings = {**config.DEFAULTS["commits"], **(cfg.get("commits") or {})}
-    kwargs = {"locales": cfg.get("locales") or None, "protected_terms": cfg.get("protected_terms")}
+    kwargs = {"locales": cfg.get("locales") or None, "protected_terms": cfg.get("protected_terms"), "register": cfg.get("register")}
     glossary = scan.default_glossary(cfg)
     if glossary:
         kwargs["aliases"] = scan.load_glossary(Path(glossary).read_text(encoding="utf-8"))

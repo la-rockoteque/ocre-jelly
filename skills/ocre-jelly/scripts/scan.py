@@ -80,13 +80,17 @@ def available_locales() -> list[str]:
     return sorted(p.stem for p in LOCALES_DIR.glob("*.py") if TAG_RE.match(p.stem))
 
 
+REGISTERS = ("formal", "neutral", "casual")
+
+
 @functools.lru_cache(maxsize=None)
-def locale_patterns(tag: str) -> tuple:
-    """(severity, category, regex, suggestion or None) for one locale tag."""
+def locale_patterns(tag: str, register: str = "neutral") -> tuple:
+    """(severity, category, regex, suggestion or None) for one locale tag in one register."""
     lang = load_locale(tag.split("-")[0])
     region = load_locale(tag) if "-" in tag else {}
+    reg = lang.get("REGISTER", {}).get(register, {})
     out = []
-    for ns in (lang, region):
+    for ns in (lang, region, reg):
         for sev in ("hard", "soft"):
             for cat, rx in ns.get(sev.upper(), {}).items():
                 out.append((sev, cat, re.compile(rx, re.I), None))
@@ -98,7 +102,8 @@ def locale_patterns(tag: str) -> tuple:
             out.append(("soft", "locale-spelling", re.compile(rf"\b{wrong}{endings}\b", re.I), (wrong, right)))
     for rx, prefer in region.get("PREFER", {}).items():
         out.append(("soft", "locale-term", re.compile(rx, re.I), prefer))
-    return tuple(out)
+    off = set(reg.get("off", []))
+    return tuple(p for p in out if p[1] not in off)
 
 
 def detect_language(segment: str, tags: list[str]) -> str:
@@ -123,11 +128,18 @@ def suggestion(match: str, suggest) -> str:
     return f"{match} -> {suggest}"
 
 
-def locale_hits(text: str, target: str, tags: list[str], protected: set[str]) -> list[dict]:
+def register_for(tag: str, register: str | dict | None) -> str:
+    if isinstance(register, dict):
+        return register.get(tag, register.get(tag.split("-")[0], "neutral"))
+    return register or "neutral"
+
+
+def locale_hits(text: str, target: str, tags: list[str], protected: set[str], register=None) -> list[dict]:
     hits = []
     for para in PARAGRAPH.finditer(target):
         seg, base = para.group(), para.start()
-        for sev, cat, rx, suggest in locale_patterns(detect_language(seg, tags)):
+        tag = detect_language(seg, tags)
+        for sev, cat, rx, suggest in locale_patterns(tag, register_for(tag, register)):
             for m in rx.finditer(seg):
                 span = text[base + m.start():base + m.end()].strip()
                 if suggest is not None and span.lower() in protected:
@@ -138,7 +150,8 @@ def locale_hits(text: str, target: str, tags: list[str], protected: set[str]) ->
 
 
 def scan(text: str, include_quoted: bool = False, aliases: dict[str, list[str]] | None = None,
-         locales: list[str] | None = None, protected_terms: list[str] | None = None) -> list[dict]:
+         locales: list[str] | None = None, protected_terms: list[str] | None = None,
+         register: str | dict | None = None) -> list[dict]:
     target = text if include_quoted else mask(text)
     tags = list(locales or DEFAULT_LOCALES)
     extra = [t for t in (protected_terms or []) if t.strip()]
@@ -146,7 +159,7 @@ def scan(text: str, include_quoted: bool = False, aliases: dict[str, list[str]] 
     protected |= {w.lower() for t in extra for w in re.findall(r"\w+", t)}
     if extra:  # a protected term is never an alias to avoid either
         aliases = {a: t for a, t in (aliases or {}).items() if a.lower() not in {x.lower() for x in extra}}
-    hits = locale_hits(text, target, tags, protected)
+    hits = locale_hits(text, target, tags, protected, register)
     hits += long_sentences(text, target)
     hits += dash_paragraphs(text, target)
     hits += glossary_hits(text, target, aliases or {})
@@ -315,7 +328,7 @@ def load_settings(no_config: bool) -> dict:
     """The layered project config (config.py), applied to this module's thresholds."""
     global STE_MAX_WORDS, EM_DASH_MIN
     if no_config:
-        return {"locales": [], "severity": {}, "protected_terms": [], "glossary": None, "_root": None}
+        return {"locales": [], "severity": {}, "protected_terms": [], "glossary": None, "_root": None, "register": None}
     import config
     cfg = config.load()
     STE_MAX_WORDS = cfg["thresholds"]["sentence_words"]  # ponytail: process-wide knobs, set once at startup
@@ -387,8 +400,15 @@ def selftest() -> None:
     assert not [h for h in scan("Attention: le serveur!", locales=["fr-CA"]) if h["category"] == "typography"]
     assert not scan("Le libellé « Il est important de noter que » reste.", locales=["fr-CA"]), "guillemets not masked"
     assert scan("Here's the thing: it works.")  # default en,fr still catches English
+    casual = "Salut! Check tes scores, pis dis-moi si ça fait du sens."
+    assert "anglicism" in {h["category"] for h in scan(casual, locales=["fr-CA"])}
+    assert "anglicism" not in {h["category"] for h in scan(casual, locales=["fr-CA"], register={"fr": "casual"})}
+    assert "register-informal" in {h["category"] for h in scan(casual, locales=["fr-CA"], register={"fr": "formal"})}
+    assert "register-informal" in {h["category"] for h in scan("We don't ship it.", register="formal")}
+    assert "throat-clearing" in {h["category"] for h in scan("Salut! Il est important de noter que ça marche.", register={"fr": "casual"})}
     for tag in available_locales():
-        locale_patterns(tag)  # every shipped locale compiles
+        for r in REGISTERS:
+            locale_patterns(tag, r)  # every shipped locale compiles in every register
     assert not [h for h in scan("Colours ship.", locales=["en-US"], protected_terms=["Colours"])]
     assert not scan("Each purchase is stored.", aliases={"purchase": ["Order"]}, protected_terms=["purchase"])
     assert not scan("Don't treat missing evidence as an AI tell.") and scan("As an AI language model, I cannot.")
@@ -443,7 +463,7 @@ def main() -> None:
         with open(glossary, encoding="utf-8") as f:
             aliases = load_glossary(read_capped(f))
     locales = parse_locales(args.locale) or cfg["locales"] or None
-    hits = scan(text, args.include_quoted, aliases, locales, cfg["protected_terms"])
+    hits = scan(text, args.include_quoted, aliases, locales, cfg["protected_terms"], cfg.get("register"))
     if cfg["severity"]:
         import config
         hits = config.apply_severity(hits, cfg["severity"])

@@ -242,6 +242,36 @@
           "default": 24
         }
       }
+    },
+    "register": {
+      "description": "How formal new prose is: one value for every language, or per language, e.g. {\"fr\": \"casual\"}. Default neutral.",
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "formal",
+            "neutral",
+            "casual"
+          ]
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "formal",
+              "neutral",
+              "casual"
+            ]
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   }
 }

@@ -37,6 +37,22 @@ The generated [Locales](../reference/locales.md) page has the exact lists.
 - **String resources**: the file path wins. `locales/fr-CA/nav.json`, `Strings.fr.resx` and `fr.lproj/Localizable.strings` are checked as fr-CA or fr, whatever the configured list says.
 - **Writing**: the session rules name the locales, so Claude also writes new prose in them.
 
+## Set a register
+
+A register sets how formal the prose is, per language:
+
+```bash
+python3 $OJ/modules.py config set register '{"fr":"casual","en":"neutral"}' --project
+```
+
+| Register | Use it for | What changes |
+|---|---|---|
+| `formal` | Contracts, policies, customer letters | Soft `register-informal` findings: « tu », « pis » and « chu » in French; contractions and "gonna" in English |
+| `neutral` (default) | Docs, READMEs, commits, PRs, comments | Nothing |
+| `casual` | Team chat, Slack posts, beta invitations | fr-CA anglicisms like « check » stop being findings |
+
+Claude writes new prose in the configured register, and a rewrite keeps the source's register. A casual French post can say « Check tes scores, pis dis-moi si ça marche », but it still can't say « Il est important de noter que ». AI-tell checks stay on in every register. The rules for each language and register are in `skills/ocre-jelly/references/registers.md`.
+
 ## Keep a word's spelling
 
 Glossary Terms keep their spelling. If the glossary has a Term **Center** (a product name) in an en-GB repo, ocre-jelly doesn't suggest "Center -> Centre". Add other words, such as brand names, to `protected_terms`:

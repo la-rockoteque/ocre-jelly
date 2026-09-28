@@ -7,6 +7,7 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 ### Added
 
 - Inline suppression: `ocre-jelly: ignore [categories]` (the next line, or its own line as a trailing comment) and `ocre-jelly: off` / `on` blocks, in any comment syntax.
+- Registers: `register` (formal, neutral or casual, per language). Casual turns off the fr-CA anglicism check, formal adds soft `register-informal` findings, and AI-tell checks stay on in every register. `references/registers.md` holds the writing rules. fr-CA now also catches conjugated « fait du sens ».
 - `evals/`: eight `claude plugin eval` cases (English and French audits, fact-preserving rewrite, clean no-op, protected quotes, echo doc comments, commit message, unsupported request), each run with and without the plugin.
 - Usage statistics record the rewrite gates (`--preserve`, `--same-code`): passed or failed.
 - `codedoc.py --format gitlab` (a Code Quality report for merge requests) and `--fail-on hard|soft`.

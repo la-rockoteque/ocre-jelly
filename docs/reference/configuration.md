@@ -18,6 +18,7 @@ The repo is the nearest parent folder that contains `.git`. The JSON Schema is `
 | `$schema` | string | — | Optional. Points editors at the schema. Ignored by ocre-jelly. |
 | `enabled` | boolean | `true` | `false` stops the session and subagent hooks from injecting rules. The skill still works when you call it. |
 | `locales` | list of tags | `[]` | For example `["en-CA", "fr-CA"]`. Each tag is `ll` or `ll-RR`. Empty: detect English and French, with no regional checks. See [Locales](locales.md). |
+| `register` | `"formal"`, `"neutral"`, `"casual"`, or a map | `null` (neutral) | How formal new prose is, for every language or per language: `{"fr": "casual", "en": "neutral"}`. `casual` turns off the fr-CA `anglicism` check; `formal` adds soft `register-informal` findings. AI-tell checks stay on in every register. See [Configure locales](../how-to/configure-locales.md#set-a-register). |
 | `glossary` | string or `null` | `null` | Path of the ubiquitous-language file, from the repo root. It must stay inside the repo. `null`: `docs/ubiquitous-language.md`, then `UBIQUITOUS-LANGUAGE.md` (in any case). |
 | `modules` | object | `{}` | Module name to `on`, `off` or `auto`. A missing name uses the module's default. See [Modules](modules.md). |
 | `inject` | `"index"` or `"full"` | `"index"` | `index`: one line per active module, and the agent reads the file on demand. `full`: inline every active module. |

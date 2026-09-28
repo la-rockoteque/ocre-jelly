@@ -54,6 +54,7 @@ CHECKS = {
     "locale-spelling": ("Spelling from another variety of English", "\"colour\" in en-US, \"color\" in en-GB"),
     "locale-term": ("A term the locale replaces", "\"e-mail\" in fr-CA (courriel), \"hashtag\" in fr-FR (mot-dièse)"),
     "anglicism": ("Anglicism the OQLF advises against (fr-CA)", "« céduler », « faire du sens », « à l'effet que »"),
+    "register-informal": ("Informal marker in a `formal` register", "\"don't\", \"gonna\", « tu », « pis »"),
     "typography": ("Missing no-break space before ; : ! ? (fr-FR, fr-BE)", "« Attention: »"),
     "echo-doc": ("Doc summary that only restates the declaration", "\"Gets the user name.\" on GetUserName"),
     "param-echo": ("Parameter description that only restates the name", "\"@param id The id.\""),
