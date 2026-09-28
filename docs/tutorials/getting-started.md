@@ -53,7 +53,15 @@ Claude checks the rewrite again with the scanner, and confirms that no number, n
 
 ## 4. Set up a repo
 
-Open a repo in Claude Code and ask:
+The quickest way is the wizard. Open a repo in Claude Code and type:
+
+```
+/ocre-jelly setup
+```
+
+It looks at the repo (languages, locale folders, glossary, commit tooling, hook manager), then asks five short rounds of questions: scope and language, checks, commits, other tools, and your personal settings. It shows the plan before it writes anything. See [Run the setup wizard](../how-to/run-the-setup-wizard.md).
+
+To set a single value instead, just ask. For example:
 
 ```
 Set ocre-jelly's locales to en-CA and fr-CA for this repo, shared with the team.

@@ -54,16 +54,18 @@ Or ask Claude: "set ocre-jelly's locales to en-CA and fr-CA for this repo."
 ```bash
 git clone https://git.nexapptech.com/vbernier/ocre-jelly.git
 cd ocre-jelly
-./setup.sh                  # user scope; --scope project|local also work
+./setup.sh                  # user scope; --scope project|local also work. Offers the setup wizard at the end
+./setup.sh --wizard --repo ~/dev/my-app   # install, then configure that repo without asking
 ./setup.sh --check          # self-tests only
 ./setup.sh --uninstall
 ```
 
-Restart Claude Code after you install. To get new versions from `main` automatically, or to be asked first, see [Keep ocre-jelly up to date](docs/how-to/keep-up-to-date.md).
+Restart Claude Code after you install, then run `/ocre-jelly setup` to configure it. To get new versions from `main` automatically, or to be asked first, see [Keep ocre-jelly up to date](docs/how-to/keep-up-to-date.md).
 
 ## Use
 
 ```
+/ocre-jelly setup                    the configuration wizard: locales, glossary, checks, commits, exports, updates
 /ocre-jelly audit README.md          flag AI tells, change nothing
 /ocre-jelly rewrite docs/guide.md    minimal repairs, facts preserved
 /ocre-jelly docs src/api/*.ts        audit or fix comments and doc comments
@@ -134,7 +136,7 @@ skills/ocre-jelly/
   references/          STE100, French rules, patterns, code-doc conventions, glossary template
   modules/             39 switchable integrations and conventions
   locales/             en, fr and 8 regional variants
-  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), feedback.py, telemetry.py, update.py, modules.py (modules, config, hooks), config.py, gen_docs.py
+  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), feedback.py, telemetry.py, update.py, wizard.py, modules.py (modules, config, hooks), config.py, gen_docs.py
 docs/                  user documentation (Diátaxis: tutorials, how-to, reference, explanation)
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall

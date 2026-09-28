@@ -14,6 +14,7 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 
 | Task | Guide |
 |---|---|
+| Configure everything in one guided pass | [Run the setup wizard](how-to/run-the-setup-wizard.md) |
 | Share ocre-jelly with a team through the repo | [Set up a team repo](how-to/set-up-a-team-repo.md) |
 | Give the project one vocabulary | [Write a ubiquitous-language glossary](how-to/write-a-glossary.md) |
 | Check spelling and terms for en-CA, fr-CA, fr-FR and others | [Configure locales](how-to/configure-locales.md) |
@@ -31,7 +32,7 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 ## Reference
 
 - [Configuration](reference/configuration.md): every key, its type and default, the layers, and the environment variables.
-- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `commitmsg.py`, `feedback.py`, `telemetry.py`, `update.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
+- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `commitmsg.py`, `feedback.py`, `telemetry.py`, `update.py`, `wizard.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
 - [Checks](reference/checks.md): every finding category, its severity and its languages. *Generated.*
 - [Modules](reference/modules.md): all 39 modules, their defaults and triggers. *Generated.*
 - [Locales](reference/locales.md): the 10 locales and what each one checks. *Generated.*

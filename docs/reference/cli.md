@@ -117,6 +117,16 @@ See [Collect usage statistics](../how-to/collect-usage-statistics.md).
 
 See [Keep ocre-jelly up to date](../how-to/keep-up-to-date.md).
 
+## wizard.py: the setup wizard's back end
+
+| Command | Does |
+|---|---|
+| `detect` | JSON facts about the repo: languages, locales found in resource paths, glossary, commit tooling, hook manager, ADR folder, PR template, other agents' folders, active modules and the current config. It reads names, not file contents, and skips dependency and build folders (at most 20,000 files). |
+| `apply PLAN.json` (or `-` for stdin) | Write a plan: `{"user": {…}, "project": {…}, "local": {…}, "exports": […], "dry_run": false}`. Every layer is validated before anything is written. Objects merge into what each layer already has. |
+| `--selftest` | Run the self-test. |
+
+The questions themselves live in `skills/ocre-jelly/references/wizard.md`; `/ocre-jelly setup` asks them.
+
 ## modules.py: modules, config and hooks
 
 | Command | Does |
@@ -142,7 +152,9 @@ Run it from a clone.
 
 | Command | Does |
 |---|---|
-| `./setup.sh` | Self-tests, validate, add the marketplace and install the plugin (user scope). |
+| `./setup.sh` | Self-tests, validate, add the marketplace and install the plugin (user scope). Then it asks whether to run the setup wizard, and for which repo (default: the current folder). |
+| `./setup.sh --wizard [--repo DIR]` | Same, then start the wizard in DIR without asking. |
+| `./setup.sh --no-wizard` | Install only. A non-interactive run (CI, piped input) also skips the wizard. |
 | `./setup.sh --scope project` or `--scope local` | Same, for the current repo. |
 | `./setup.sh --check` | Every self-test and the docs check. Installs nothing. |
 | `./setup.sh --uninstall [--scope …]` | Uninstall the plugin. |

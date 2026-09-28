@@ -2,7 +2,7 @@
 name: ocre-jelly
 description: Find and remove AI writing patterns from prose. Two modes - audit (flag tells, change nothing) and rewrite (minimal repair, facts preserved). Use when the user invokes ocre-jelly or asks to "unslop" prose, "humanize", "make it sound human", "remove AI patterns", says text "sounds like ChatGPT" or "sounds robotic", or wants drafted docs, READMEs, commit bodies or PR descriptions cleaned up before publishing. Also audits and rewrites code comments and doc comments (JSDoc, TSDoc, Javadoc, KDoc, .NET XML docs, docstrings, godoc, rustdoc, Doxygen, PHPDoc, Swift, YARD), including GhostDoc and other generated stubs. Prose only: for code slop use ai-slop-cleaner or ponytail-review.
 user-invocable: true
-argument-hint: "[audit|rewrite|docs|modules] <text, file or folder>"
+argument-hint: "[setup|audit|rewrite|docs|commit|modules|config|update|stats|feedback] <text, file or folder>"
 ---
 
 # Ocre Jelly
@@ -15,6 +15,7 @@ Repair concrete AI-writing defects. Leave everything else alone. A no-op beats a
 
 ## Modes
 
+- `setup` (also: "configure ocre-jelly", "run the wizard"): the configuration wizard. Read [references/wizard.md](references/wizard.md) and follow it.
 - `audit` (also: "review", "just flag it", "don't change anything"): report findings, never rewrite.
 - `rewrite` (default when no mode word is given): diagnose, then make the smallest repairs.
 - `docs [audit] <files>`: the same two passes, on the comments and doc comments of source files. See [Code docs](#code-docs).
