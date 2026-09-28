@@ -62,11 +62,16 @@ DEFAULTS = {
         "debug": False,             # also keep error tracebacks in ~/.claude/ocre-jelly/debug.log
         "retention_days": 30,
     },
+    "updates": {                   # update.py: follow the marketplace's main branch at session start
+        "mode": "off",              # off | prompt (check, then ask) | silent (Claude Code's own auto-update)
+        "branch": "main",
+        "check_hours": 24,          # prompt mode: at most one background check per this many hours
+    },
 }
 
 TYPES = {"enabled": bool, "locales": list, "glossary": (str, type(None)), "modules": dict, "inject": str,
          "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list,
-         "commits": dict, "feedback": dict, "telemetry": dict}
+         "commits": dict, "feedback": dict, "telemetry": dict, "updates": dict}
 
 
 def claude_dir() -> Path:
@@ -149,6 +154,15 @@ def validate(data: dict, where: str) -> list[str]:
             errors.append(f"{where}: telemetry.retention_days must be a positive integer")
         elif key not in ("enabled", "debug", "retention_days"):
             errors.append(f"{where}: unknown key telemetry.{key}")
+    for key, value in (data.get("updates") or {}).items():
+        if key == "mode" and value not in ("off", "prompt", "silent"):
+            errors.append(f"{where}: updates.mode must be off, prompt or silent")
+        elif key == "branch" and not (isinstance(value, str) and re.fullmatch(r"[\w./-]{1,100}", value) and ".." not in value):
+            errors.append(f"{where}: updates.branch must be a plain branch name")
+        elif key == "check_hours" and (not isinstance(value, int) or isinstance(value, bool) or value < 1):
+            errors.append(f"{where}: updates.check_hours must be a positive integer")
+        elif key not in ("mode", "branch", "check_hours"):
+            errors.append(f"{where}: unknown key updates.{key}")
     if data.get("inject") not in (None, "index", "full"):
         errors.append(f"{where}: inject must be index or full")
     return errors
@@ -186,17 +200,22 @@ def load(root: Path | None = None) -> dict:
     root = root or project_root()
     cfg, sources = copy.deepcopy(DEFAULTS), {}
     consent = {}  # telemetry on/off per layer
+    updates_by_layer = {}
     for layer in LAYERS:
         data = read_layer(layer_path(layer, root))
         data.pop("$schema", None)
         cfg = merge(cfg, data)
         sources.update({k: layer for k in data})
         consent[layer] = (data.get("telemetry") or {})
+        updates_by_layer[layer] = (data.get("updates") or {})
     # Consent is personal: only the user or local layer can turn telemetry (or debug) on.
     # A committed project layer can only turn it off.
     for key in ("enabled", "debug"):
         personal = consent["local"].get(key, consent["user"].get(key, False))
         cfg["telemetry"][key] = bool(personal) and consent["project"].get(key) is not False
+    # Same rule for updates: they reach the network, so only you choose a mode; a project can force "off".
+    modes = [layer_data.get("mode") for layer_data in (updates_by_layer["user"], updates_by_layer["local"]) if layer_data.get("mode")]
+    cfg["updates"]["mode"] = "off" if updates_by_layer["project"].get("mode") == "off" else (modes[-1] if modes else "off")
     if os.environ.get("OCRE_JELLY", "").lower() == "off":
         cfg["enabled"], sources["enabled"] = False, "env"
     if os.environ.get("OCRE_JELLY_SUBAGENT_MATCHER"):

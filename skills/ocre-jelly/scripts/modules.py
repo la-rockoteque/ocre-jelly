@@ -212,8 +212,19 @@ def run_hook(event: str) -> None:
     telemetry.record("hook", started, event=event, words=len(text.split()), locales=cfg["locales"] or None,
                      modules_active=len(text.split("Active modules.", 1)[1].splitlines()) - 1 if "Active modules." in text else 0,
                      agent=str(payload.get("agent_type") or "") or None if event == "subagent-start" else None)
+    notice = None
+    if event == "session-start":
+        try:
+            import update
+            notice = update.hook_notice()  # prompt mode only; the network check itself runs in the background
+        except Exception as e:  # noqa: BLE001 - an update problem must never break session start
+            print(f"ocre-jelly update check skipped: {e}", file=sys.stderr)
     if event == "subagent-start":  # SubagentStart drops raw stdout; it needs this JSON form
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SubagentStart", "additionalContext": text}}))
+    elif notice:  # JSON form so the user also sees the notice
+        user, agent = notice
+        print(json.dumps({"systemMessage": user,
+                          "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": text + "\n" + agent}}))
     else:
         sys.stdout.write(text)
 

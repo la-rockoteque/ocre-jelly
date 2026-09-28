@@ -216,6 +216,32 @@
           "default": 30
         }
       }
+    },
+    "updates": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Follow the marketplace's main branch at session start. Only the user and local layers can choose a mode; the project layer can only force off.",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "off",
+            "prompt",
+            "silent"
+          ],
+          "default": "off",
+          "description": "prompt: check in the background, then ask before updating. silent: Claude Code's own marketplace auto-update."
+        },
+        "branch": {
+          "type": "string",
+          "default": "main"
+        },
+        "check_hours": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 24
+        }
+      }
     }
   }
 }

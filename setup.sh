@@ -26,7 +26,7 @@ done
 
 selftests() {
   command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
-  for t in config scan codedoc commitmsg feedback telemetry modules; do
+  for t in config scan codedoc commitmsg feedback telemetry update modules; do
     printf '%-10s ' "$t"
     python3 "$SRC/skills/ocre-jelly/scripts/$t.py" --selftest 2>/dev/null || { echo "FAILED: $t" >&2; exit 1; }
   done

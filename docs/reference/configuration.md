@@ -1,6 +1,6 @@
 # Configuration
 
-ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`, `feedback`, `telemetry`) merge key by key, except that `telemetry.enabled` and `telemetry.debug` follow the consent rule below; every other value replaces the one before it.
+ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`, `feedback`, `telemetry`, `updates`) merge key by key, except that `telemetry.enabled`, `telemetry.debug` and `updates.mode` follow the personal-consent rule (only the user and local layers turn them on); every other value replaces the one before it.
 
 | # | Layer | File | Commit it? | Written by |
 |---|---|---|---|---|
@@ -41,6 +41,9 @@ The repo is the nearest parent folder that contains `.git`. The JSON Schema is `
 | `telemetry.enabled` | boolean | `false` | Record local usage statistics. **Only the user and local layers can turn it on**; the project layer can only turn it off. See [Collect usage statistics](../how-to/collect-usage-statistics.md). |
 | `telemetry.debug` | boolean | `false` | Also keep error tracebacks in `~/.claude/ocre-jelly/debug.log`. Same consent rule. |
 | `telemetry.retention_days` | integer ≥ 1 | `30` | Older events are dropped. |
+| `updates.mode` | `"off"`, `"prompt"`, `"silent"` | `"off"` | Follow the marketplace's main branch at session start. **Only the user and local layers can choose a mode**; the project layer can only force `"off"`. See [Keep ocre-jelly up to date](../how-to/keep-up-to-date.md). |
+| `updates.branch` | branch name | `"main"` | The branch that prompt mode compares with the installed commit. |
+| `updates.check_hours` | integer ≥ 1 | `24` | Prompt mode runs at most one background check per this many hours. |
 | `commits.types` | list of strings | `[]` | Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert. |
 
 ## Environment variables

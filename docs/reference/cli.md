@@ -105,6 +105,18 @@ The script never sends anything; the browser talks to the form when you click Su
 
 See [Collect usage statistics](../how-to/collect-usage-statistics.md).
 
+## update.py: updates
+
+| Command | Does |
+|---|---|
+| `status` | Mode, installed commit, latest known commit, last check, native auto-update state. |
+| `mode off\|prompt\|silent` | Set your mode (user layer). `silent` also turns Claude Code's marketplace auto-update on; the other modes turn it off. |
+| `check [--now]` | Refresh the latest-commit cache. The hook runs it in the background when a check is due. |
+| `apply` | `claude plugin marketplace update ocre-jelly`, then `claude plugin update ocre-jelly@ocre-jelly`. |
+| `--selftest` | Run the self-test (offline). |
+
+See [Keep ocre-jelly up to date](../how-to/keep-up-to-date.md).
+
 ## modules.py: modules, config and hooks
 
 | Command | Does |

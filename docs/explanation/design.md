@@ -53,7 +53,8 @@ Each of these rules is a module, so a team that doesn't use the tool can turn th
 
 The unslop project that inspired ocre-jelly harvested chat transcripts, opened pull requests and fetched from the network. ocre-jelly does none of that:
 
-- Standard-library Python only. No network access, no subprocesses.
+- Standard-library Python only. The scanners, hooks and config make no network calls and run no programs.
+- One exception, opt-in and personal: in `prompt` mode, `update.py` runs `git ls-remote` in the background (read-only, no credential prompts, 10 s timeout), and `update.py apply` runs the claude CLI's own update commands after you say yes. `silent` mode only switches on Claude Code's native marketplace auto-update.
 - The scanners read stdin, the files you name, the glossary and the config layers. Nothing else.
 - Writes go only to the config layers and to export targets. Every export target must resolve inside the repo, and the glossary path must too.
 - Exports never overwrite a file that ocre-jelly didn't generate, without `--force`.

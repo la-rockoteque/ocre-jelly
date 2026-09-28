@@ -18,7 +18,7 @@ Prose mode for Claude Code. It removes AI writing patterns from the text your ag
 
 **Full documentation: [docs/](docs/README.md).** It has a tutorial, how-to guides (team setup, glossary, locales, code docs, modules, tuning), the complete configuration reference and the writing standards.
 
-Security posture: Python standard library only. Usage statistics are opt-in, local and counts-only; see [Collect usage statistics](docs/how-to/collect-usage-statistics.md). No network access, no subprocesses, no transcript harvesting, no automatic PRs. The scanners read only stdin, the files you name and the ocre-jelly config files.
+Security posture: Python standard library only. The scanners, hooks and config never touch the network or run programs; they read only stdin, the files you name and the ocre-jelly config. Two features are opt-in exceptions, and only you can turn them on: usage statistics (local, counts only; see [Collect usage statistics](docs/how-to/collect-usage-statistics.md)) and update checks (`git ls-remote`, read-only; see [Keep ocre-jelly up to date](docs/how-to/keep-up-to-date.md)). No transcript harvesting, no automatic PRs, and nothing is ever sent without you clicking Submit.
 
 ## Install
 
@@ -59,7 +59,7 @@ cd ocre-jelly
 ./setup.sh --uninstall
 ```
 
-Restart Claude Code after you install.
+Restart Claude Code after you install. To get new versions from `main` automatically, or to be asked first, see [Keep ocre-jelly up to date](docs/how-to/keep-up-to-date.md).
 
 ## Use
 
@@ -134,7 +134,7 @@ skills/ocre-jelly/
   references/          STE100, French rules, patterns, code-doc conventions, glossary template
   modules/             39 switchable integrations and conventions
   locales/             en, fr and 8 regional variants
-  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), feedback.py, telemetry.py, modules.py (modules, config, hooks), config.py, gen_docs.py
+  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), feedback.py, telemetry.py, update.py, modules.py (modules, config, hooks), config.py, gen_docs.py
 docs/                  user documentation (Diátaxis: tutorials, how-to, reference, explanation)
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall
