@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ocre-jelly configuration",
+  "description": "Layers, later wins: ~/.claude/ocre-jelly.json, <repo>/.claude/ocre-jelly.json (committed), <repo>/.claude/ocre-jelly.local.json (personal).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Inject the prose rules into sessions and subagents."
+    },
+    "locales": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "examples": [
+        [
+          "en-CA",
+          "fr-CA"
+        ]
+      ],
+      "description": "Locale tags; each paragraph uses the one whose language it is written in. Empty: detect en/fr without regional checks."
+    },
+    "glossary": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Ubiquitous-language file, from the repo root. Null: docs/ubiquitous-language.md or UBIQUITOUS-LANGUAGE.md."
+    },
+    "modules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": [
+          "on",
+          "off",
+          "auto"
+        ]
+      },
+      "description": "Module name to on, off or auto. See `modules.py list`."
+    },
+    "inject": {
+      "type": "string",
+      "enum": [
+        "index",
+        "full"
+      ],
+      "default": "index",
+      "description": "index: one line per module (progressive disclosure). full: inline every active module."
+    },
+    "subagents": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inject": {
+          "type": "boolean",
+          "default": true
+        },
+        "matcher": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Regex on the subagent type; only matching subagents get the rules."
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sentence_words": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 25
+        },
+        "instruction_words": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 20
+        },
+        "em_dash_per_paragraph": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3
+        },
+        "length_hits_per_file": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3
+        }
+      }
+    },
+    "severity": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": [
+          "hard",
+          "soft",
+          "off"
+        ]
+      },
+      "description": "Category to hard, soft or off, e.g. {\"em-dash\": \"off\"}."
+    },
+    "ignore_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Globs from the repo root that docs mode skips."
+    },
+    "protected_terms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Words never flagged or respelled."
+    }
+  }
+}

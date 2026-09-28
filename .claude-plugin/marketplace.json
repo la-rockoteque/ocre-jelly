@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ocre-jelly",
+  "description": "Prose mode for AI agents: no slop, STE100 clarity, one term per concept.",
+  "owner": {
+    "name": "Rocko Bernier",
+    "email": "vbernier@nexapp.ca"
+  },
+  "plugins": [
+    {
+      "name": "ocre-jelly",
+      "description": "Prose mode: no AI slop, STE100 clarity, one term per concept, per-locale spelling.",
+      "source": "./",
+      "category": "productivity",
+      "version": "0.1.0"
+    }
+  ]
+}

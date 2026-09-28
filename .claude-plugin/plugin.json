@@ -1,0 +1,49 @@
+{
+  "name": "ocre-jelly",
+  "version": "0.1.0",
+  "description": "Prose mode for AI agents: removes AI writing patterns from docs, READMEs, commits, PRs, code comments and UI strings, under ASD-STE100 / French plain-language rules, the project's ubiquitous language and its locales. Modular: 38 switchable integrations and conventions, 10 locales.",
+  "author": {
+    "name": "Rocko Bernier",
+    "email": "vbernier@nexapp.ca"
+  },
+  "homepage": "https://git.nexapptech.com/vbernier/ocre-jelly",
+  "repository": "https://git.nexapptech.com/vbernier/ocre-jelly",
+  "keywords": [
+    "writing",
+    "docs",
+    "prose",
+    "ai-slop",
+    "ste100",
+    "plain-language",
+    "i18n",
+    "code-comments",
+    "conventional-commits"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/ocre-jelly/scripts/modules.py\" hook session-start",
+            "timeout": 5,
+            "statusMessage": "Loading ocre-jelly prose mode..."
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/ocre-jelly/scripts/modules.py\" hook subagent-start",
+            "timeout": 5,
+            "statusMessage": "Loading ocre-jelly prose mode..."
+          }
+        ]
+      }
+    ]
+  }
+}
