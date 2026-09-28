@@ -115,3 +115,7 @@ skills/ocre-jelly/
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall
 ```
+
+## License
+
+Proprietary. All rights reserved. See [LICENSE](LICENSE).
