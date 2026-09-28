@@ -2,6 +2,26 @@
 
 Every setting below goes in a config layer: `--project` for the team, `--local` for you in this clone, or no flag for you in every repo. See [Configuration](../reference/configuration.md).
 
+## Silence one spot
+
+Put a marker in a comment, in the file's own comment syntax:
+
+```markdown
+<!-- ocre-jelly: ignore throat-clearing -->
+Here's the thing: this sentence quotes the pattern on purpose.
+```
+
+```ts
+// ocre-jelly: ignore echo-doc
+/** Gets the user. */
+```
+
+- `ocre-jelly: ignore cat1, cat2` on a line of its own covers the next non-blank line. As a trailing comment, it covers its own line.
+- `ocre-jelly: ignore` with no category covers every category.
+- `ocre-jelly: off` … `ocre-jelly: on` covers the lines in between.
+
+There is no other syntax. For a whole category, change its severity instead (next section).
+
 ## Turn a check off, or change its severity
 
 ```bash

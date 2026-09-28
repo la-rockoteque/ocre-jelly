@@ -400,6 +400,7 @@ def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None,
     hits = scan.scan("\n".join(prose), aliases=aliases, locales=locales, protected_terms=protected_terms)
     for b in blocks:
         hits += doc_hits(b)
+    hits = scan.suppress(hits, src)  # markers in the raw source also cover doc-comment findings
     if not all_hits:
         hits = condense(hits)
     return sorted(hits, key=lambda h: (h["line"], h["severity"]))
@@ -570,6 +571,9 @@ export function ttl(key: string): number { const url = "http://x.io//not-a-comme
     assert block and block[0]["span"] == [1, 4], block
     kept = [h for h in scan_source(md, ".md", all_hits=True) if h["line"] in {2}]
     assert [h["category"] for h in kept] == ["throat-clearing"], kept
+
+    quiet = "// ocre-jelly: ignore echo-doc\n/** Gets the user. */\nfunction getUser() {}\n"
+    assert not [h for h in scan_source(quiet, ".ts") if h["category"] == "echo-doc"], "suppression ignored in code"
 
     go = "// Parse parses.\nfunc Parse() {}\n"
     assert [h["category"] for h in scan_source(go, ".go")] == ["echo-doc"]

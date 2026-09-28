@@ -2,7 +2,7 @@
 
 # Checks
 
-Every finding has a category and a severity. **hard** means almost always a defect outside quotes. **soft** means a candidate that the agent confirms in context. A scanner hit is never a verdict by itself: see [the standards](../explanation/standards.md). Change a category's severity, or turn it off, with the `severity` map of the [configuration](configuration.md).
+Every finding has a category and a severity. **hard** means almost always a defect outside quotes. **soft** means a candidate that the agent confirms in context. A scanner hit is never a verdict by itself: see [the standards](../explanation/standards.md). Change a category's severity, or turn it off, with the `severity` map of the [configuration](configuration.md). To silence one spot, use `ocre-jelly: ignore <category>` or `ocre-jelly: off` / `on` in a comment (see [Tune the checks](../how-to/tune-checks.md)).
 
 | Category | Severity | Languages | Scanner | What it flags | Examples |
 |---|---|---|---|---|---|

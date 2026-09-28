@@ -45,7 +45,7 @@ Input is inline text or a file path the user gives. Only read files the user nam
    ```
    Write inline text to a scratch file first. Never interpolate user text into a shell command line.
 3. Load [references/patterns.md](references/patterns.md) for the full catalog and the protection rules. Check the text against its language's prose authority too, at full strength for technical text and vocabulary/clarity only for other registers. French has its own AI tells (« Il est important de noter que », « N'hésitez pas à », « Plongeons dans »); the scanner knows them.
-4. Classify each candidate as **confirmed** (a real defect in this context) or **protected** (literal, quoted, domain-valid, attributed, or natural for the genre), with a one-line reason. A scanner hit is a candidate, not a verdict. Phrase lists are incomplete, so also catch paraphrased scaffolding by what it does.
+4. Findings under an `ocre-jelly: ignore` or `ocre-jelly: off` marker are already removed: respect them, and never delete the markers. Classify each remaining candidate as **confirmed** (a real defect in this context) or **protected** (literal, quoted, domain-valid, attributed, or natural for the genre), with a one-line reason. A scanner hit is a candidate, not a verdict. Phrase lists are incomplete, so also catch paraphrased scaffolding by what it does.
 
 ## Pass 2: rewrite (rewrite mode only)
 

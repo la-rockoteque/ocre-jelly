@@ -150,7 +150,58 @@ def scan(text: str, include_quoted: bool = False, aliases: dict[str, list[str]] 
     hits += long_sentences(text, target)
     hits += dash_paragraphs(text, target)
     hits += glossary_hits(text, target, aliases or {})
-    return sorted(hits, key=lambda h: (h["line"], h["severity"]))
+    return sorted(suppress(hits, text), key=lambda h: (h["line"], h["severity"]))
+
+
+# ---- inline suppression -----------------------------------------------------
+# `ocre-jelly: ignore [cat, cat]` covers the next non-blank line (or its own line as a
+# trailing comment); `ocre-jelly: off` ... `ocre-jelly: on` covers a block. Any comment syntax.
+
+MARKER = re.compile(r"ocre-jelly:\s*(ignore|off|on)\b([^\n]*)", re.I)
+COMMENT_OPENER = re.compile(r"^\s*(?:<!--|/\*+|\*|//+|#+|--|;+|%+|'|\")?\s*$")
+
+
+def suppressions(text: str) -> dict[int, set[str] | None]:
+    """Line number -> suppressed categories (None = all)."""
+    lines = text.split("\n")
+    out: dict[int, set[str] | None] = {}
+    off = False
+
+    def add(n: int, cats: set[str] | None) -> None:
+        if n in out and (out[n] is None or cats is None):
+            out[n] = None
+        else:
+            out[n] = (out.get(n) or set()) | (cats or set()) if cats is not None else None
+
+    for i, line in enumerate(lines, start=1):
+        m = MARKER.search(line)
+        if off:
+            add(i, None)
+        if not m:
+            continue
+        kind = m.group(1).lower()
+        if kind == "off":
+            off = True
+            add(i, None)
+        elif kind == "on":
+            off = False
+            add(i, None)
+        else:
+            rest = re.sub(r"(?:-->|\*/)\s*$", "", m.group(2)).strip()
+            cats = {c.strip() for c in re.split(r"[,\s]+", rest) if re.fullmatch(r"[a-z][a-z0-9-]*", c.strip())} or None
+            add(i, None)  # the marker line itself
+            if COMMENT_OPENER.match(line[:m.start()]):  # a marker on its own line: the next non-blank line
+                nxt = next((j for j in range(i, len(lines)) if lines[j].strip()), None)
+                if nxt is not None:
+                    add(nxt + 1, cats)
+            else:
+                add(i, cats)
+    return out
+
+
+def suppress(hits: list[dict], text: str) -> list[dict]:
+    rules = suppressions(text) if "ocre-jelly:" in text.lower() else {}
+    return [h for h in hits if not (h["line"] in rules and (rules[h["line"]] is None or h["category"] in rules[h["line"]]))]
 
 
 EM_DASH_MIN = 3  # one em-dash proves nothing; a habit shows as several per paragraph
@@ -342,6 +393,10 @@ def selftest() -> None:
     assert not scan("Each purchase is stored.", aliases={"purchase": ["Order"]}, protected_terms=["purchase"])
     assert not scan("Don't treat missing evidence as an AI tell.") and scan("As an AI language model, I cannot.")
     assert not [h for h in scan("| " + " | ".join(["cell words here"] * 12) + " |") if h["category"] == "ste-length"]
+    doc = ("<!-- ocre-jelly: ignore throat-clearing -->\nHere's the thing: kept on purpose.\nHere's the thing: flagged.\n"
+           "Let's dive in. <!-- ocre-jelly: ignore -->\n<!-- ocre-jelly: off -->\nGreat question!\n<!-- ocre-jelly: on -->\nI hope this helps.\n")
+    assert [(h["line"], h["category"]) for h in scan(doc)] == [(3, "throat-clearing"), (8, "chatbot-artifact")], scan(doc)
+    assert [h["line"] for h in scan("# ocre-jelly: ignore em-dash\n\nHere's the thing.\n")] == [3], "wrong category suppressed"
     # ReDoS guard: pathological input must return fast
     scan("isn't " + "a" * 200_000)
     print("selftest ok")
