@@ -26,6 +26,7 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 | Add a language or a regional variant | [Add a locale](how-to/add-a-locale.md) |
 | Something doesn't work | [Troubleshoot](how-to/troubleshoot.md) |
 | Get new versions automatically, or be asked first | [Keep ocre-jelly up to date](how-to/keep-up-to-date.md) |
+| Show findings in GitLab merge requests | [Run in GitLab CI](how-to/run-in-gitlab-ci.md) |
 | Keep local usage statistics, and share them if you choose | [Collect usage statistics](how-to/collect-usage-statistics.md) |
 | Request a feature, report a bug, comment | [Send feedback](how-to/send-feedback.md), or [the form](https://forms.gle/GwKgxKB23iSKyZqr7) |
 

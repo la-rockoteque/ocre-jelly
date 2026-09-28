@@ -51,6 +51,8 @@ git diff main... | python3 $OJ/codedoc.py --diff
 | `--locale TAGS` | As in `scan.py`. A locale in a resource file's path wins. |
 | `--glossary MD` | As in `scan.py`. |
 | `--all` | List every long sentence and every alias use, instead of a summary per file. |
+| `--format text\|json\|gitlab` | Output format. `gitlab` writes a Code Quality report (hard = major, soft = minor) for the merge request widget. |
+| `--fail-on hard\|soft` | Exit 1 when a finding of that severity, or higher, remains. Without it, the scan exits 0. |
 | `--diff` | Read a unified diff on stdin (`git diff`, `git diff main...`, a PR's `.diff`), and report only findings on added lines. Each changed file is scanned whole, for context. Markdown, text, reST and AsciiDoc files go through the prose checks. Deleted files are skipped. |
 | `--same-code ORIGINAL REWRITTEN` | Exit 0 and print `code unchanged` only when the two files differ in comments alone. Exit 1 otherwise. |
 | `--json`, `--no-config`, `--selftest` | As in `scan.py`. |

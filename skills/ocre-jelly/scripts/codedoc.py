@@ -25,6 +25,7 @@ Security posture: stdlib only, no network, no subprocess. Reads only the files i
 from __future__ import annotations
 
 import argparse
+import collections
 import difflib
 import io
 import json
@@ -354,6 +355,24 @@ def condense(hits: list[dict]) -> list[dict]:
     return fold_aliases(cap_length(hits))
 
 
+def gitlab_report(results: list[dict]) -> list[dict]:
+    """GitLab Code Quality (Code Climate) issues: shown in the merge request widget."""
+    import hashlib
+    out, seen = [], collections.Counter()
+    for h in results:
+        base = f"{h['file']}|{h['category']}|{h['match']}"
+        seen[base] += 1  # the same text twice in one file needs two fingerprints
+        key = f"{base}|{seen[base]}".encode()
+        out.append({
+            "description": f"{h['category']}: {h['match']}",
+            "check_name": f"ocre-jelly/{h['category']}",
+            "fingerprint": hashlib.sha1(key).hexdigest(),  # line left out, so moving text keeps its identity
+            "severity": "major" if h["severity"] == "hard" else "minor",
+            "location": {"path": h["file"], "lines": {"begin": h["line"]}},
+        })
+    return out
+
+
 def parse_diff(diff: str) -> dict[str, set[int]]:
     """Added line numbers per file, from a unified diff (git diff, git show, a PR's .diff)."""
     added: dict[str, set[int]] = {}
@@ -575,6 +594,12 @@ export function ttl(key: string): number { const url = "http://x.io//not-a-comme
     quiet = "// ocre-jelly: ignore echo-doc\n/** Gets the user. */\nfunction getUser() {}\n"
     assert not [h for h in scan_source(quiet, ".ts") if h["category"] == "echo-doc"], "suppression ignored in code"
 
+    rep_ = gitlab_report([{"file": "docs/a.md", "line": 3, "severity": "hard", "category": "throat-clearing", "match": "x"}])
+    assert rep_[0]["severity"] == "major" and rep_[0]["location"] == {"path": "docs/a.md", "lines": {"begin": 3}}
+    assert rep_[0]["check_name"] == "ocre-jelly/throat-clearing" and len(rep_[0]["fingerprint"]) == 40
+    twice = gitlab_report([{"file": "a.md", "line": n, "severity": "soft", "category": "em-dash", "match": "x"} for n in (1, 9)])
+    assert twice[0]["fingerprint"] != twice[1]["fingerprint"], "duplicate fingerprints"
+
     go = "// Parse parses.\nfunc Parse() {}\n"
     assert [h["category"] for h in scan_source(go, ".go")] == ["echo-doc"]
 
@@ -601,6 +626,9 @@ def main() -> None:
     ap.add_argument("--locale", help="comma list, e.g. en-CA,fr-CA; a locale in a resource file's path wins")
     ap.add_argument("--no-config", action="store_true", help="ignore the layered ocre-jelly JSON config")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--format", choices=("text", "json", "gitlab"), default=None,
+                    help="gitlab: a Code Quality report for the merge request widget")
+    ap.add_argument("--fail-on", choices=("hard", "soft"), help="exit 1 when a finding of this severity or higher remains")
     ap.add_argument("--all", action="store_true", help="list every long sentence and every alias use, not a summary")
     ap.add_argument("--same-code", nargs=2, metavar=("ORIGINAL", "REWRITTEN"))
     ap.add_argument("--diff", action="store_true",
@@ -671,14 +699,22 @@ def main() -> None:
         telemetry.record("codedoc", started, results, locales=cfg["locales"] or None,
                          ext=telemetry.extensions([n if n != "<stdin>" else f"x{e}" for n, e in sources]),
                          files=len(sources), skipped=len(args.files) - len(files))
-    if args.json:
-        return print(json.dumps(results, indent=2))
+    fmt = args.format or ("json" if args.json else "text")
+    failing = {"hard": {"hard"}, "soft": {"hard", "soft"}}.get(args.fail_on or "", set())
+    code = 1 if any(h["severity"] in failing for h in results) else 0
+    if fmt == "gitlab":
+        print(json.dumps(gitlab_report(results), indent=2, ensure_ascii=False))
+        sys.exit(code)
+    if fmt == "json":
+        print(json.dumps(results, indent=2))
+        sys.exit(code)
     multi = len(sources) > 1
     for h in results:
         where = f"{h['file']}:L{h['line']}" if multi else f"L{h['line']}"
         print(f"{where:<6} {h['severity']:<4} {h['category']:<22} {h['match']!r}")
     hard = sum(h["severity"] == "hard" for h in results)
     print(f"-- {len(results)} candidates ({hard} hard). Candidates only; confirm in context.")
+    sys.exit(code)
 
 
 if __name__ == "__main__":
