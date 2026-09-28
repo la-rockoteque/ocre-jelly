@@ -19,7 +19,7 @@ Tell the user, in three or four lines, what you found: languages, locales in res
 
    Personal settings (updates, statistics) always go to the user layer, whatever the answer. Say so.
 2. **Locales.** Offer the combination that `locales_found` suggests first (for example "en-CA + fr-CA (found in moship-web/src/i18n/locales)"), then single common choices (en-US, en-GB, en-CA, fr-CA, fr-FR), and "None: detect English and French only". Accept Other for any combination. Valid tags come from `scan.py --list-locales`.
-3. **Register** per language: "Neutral for everything (Recommended)", "Casual French (team chat, fr-CA)", "Formal", or Other for a map like `{"fr": "casual", "en": "neutral"}`. Ask this only when the repo writes messages, posts or customer text; docs-only repos keep neutral.
+3. **Register:** "Neutral everywhere (Recommended)", "Casual for PRs and chat, neutral elsewhere" (`{"default": "neutral", "contexts": {"pr": "casual", "chat": "casual"}}`), "Formal for code comments, neutral elsewhere", or Other: describe it, and build the object (contexts `docs`, `comments`, `strings`, `commits`, `pr`, `tickets`, `chat`, each with a value or a per-language map). Skip this question for docs-only repos.
 4. **Glossary.** If `glossary` was found: "Use docs/ubiquitous-language.md (Recommended)" or "Skip". If none: "Create docs/ubiquitous-language.md, committed", "Create UBIQUITOUS-LANGUAGE.md, local only", or "Skip for now".
 
 ## 2. Checks

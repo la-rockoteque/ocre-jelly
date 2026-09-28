@@ -170,7 +170,13 @@ def rules_text(mods: dict[str, dict], active: dict[str, tuple[bool, str]], full:
     if locales:
         parts.append(locale_line(locales))
     if register:
-        names = ", ".join(f"{k} {v}" for k, v in register.items()) if isinstance(register, dict) else f"all languages {register}"
+        if isinstance(register, dict):
+            bits = [f"default {register.get('default', 'neutral')}"] + [f"{k} {v}" for k, v in register.items() if k not in ("default", "contexts")]
+            for c, v in (register.get("contexts") or {}).items():
+                bits.append(f"{c} {v}" if isinstance(v, str) else f"{c} " + "/".join(f"{k} {x}" for k, x in v.items()))
+            names = ", ".join(bits)
+        else:
+            names = f"all languages {register}"
         parts.append(f"Register: {names}. Write new prose in it; a rewrite keeps the source's register. "
                      f"Rules: `{SKILL_DIR / 'references' / 'registers.md'}`.")
     index = []
@@ -411,7 +417,8 @@ def selftest() -> None:
         assert "ALPHA RULE" in rules_text(mods, act, full=True)
         text = rules_text(mods, act, locales=["en-CA", "fr-CA"])
         assert "Locales: en-CA:" in text and "fr -> " in text and "ste-fr.md" in text, text
-        assert "Register: fr casual" in rules_text(mods, act, register={"fr": "casual"})
+        assert "Register: default neutral, fr casual" in rules_text(mods, act, register={"fr": "casual"})
+        assert "comments formal, pr fr casual" in rules_text(mods, act, register={"contexts": {"comments": "formal", "pr": {"fr": "casual"}}})
         (mdir / "alpha.md").write_text("---\nkind: rules\ndefault: on\ninject: always\n---\nALPHA RULE\n")
         assert "ALPHA RULE" in rules_text(all_modules(mdir), act)
 

@@ -244,7 +244,7 @@
       }
     },
     "register": {
-      "description": "How formal new prose is: one value for every language, or per language, e.g. {\"fr\": \"casual\"}. Default neutral.",
+      "description": "How formal new prose is. A single value, or {default, <lang>: value, contexts: {<context>: value or {<lang>: value}}}. First match wins: context+language, context, language, default, neutral.",
       "oneOf": [
         {
           "type": "string",
@@ -255,21 +255,219 @@
           ]
         },
         {
-          "type": "object",
-          "propertyNames": {
-            "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
-          },
-          "additionalProperties": {
-            "type": "string",
-            "enum": [
-              "formal",
-              "neutral",
-              "casual"
-            ]
-          }
+          "type": "null"
         },
         {
-          "type": "null"
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "string",
+              "enum": [
+                "formal",
+                "neutral",
+                "casual"
+              ]
+            },
+            "contexts": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "docs": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "comments": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "strings": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "commits": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "pr": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "tickets": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "chat": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "formal",
+                        "neutral",
+                        "casual"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "propertyNames": {
+                        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "enum": [
+                          "formal",
+                          "neutral",
+                          "casual"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "patternProperties": {
+            "^[a-z]{2}(-[A-Z]{2})?$": {
+              "type": "string",
+              "enum": [
+                "formal",
+                "neutral",
+                "casual"
+              ]
+            }
+          },
+          "additionalProperties": false
         }
       ]
     }

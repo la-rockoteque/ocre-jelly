@@ -111,10 +111,7 @@ def validate(data: dict, where: str) -> list[str]:
     for key, value in (data.get("thresholds") or {}).items():
         if key not in DEFAULTS["thresholds"] or not isinstance(value, int) or value < 1:
             errors.append(f"{where}: thresholds.{key} must be a known key with a positive integer")
-    reg = data.get("register")
-    for key, value in (reg.items() if isinstance(reg, dict) else [("", reg)] if reg is not None else []):
-        if value not in ("formal", "neutral", "casual") or (key and not TAG_RE.match(key)):
-            errors.append(f"{where}: register must be formal, neutral or casual, or a map like {{\"fr\": \"casual\"}}")
+    errors += register_errors(data.get("register"), where)
     for tag in data.get("locales") if isinstance(data.get("locales"), list) else []:
         if not isinstance(tag, str) or not TAG_RE.match(tag):
             errors.append(f"{where}: locales entry {tag!r} must look like en, en-CA or fr-FR")
@@ -171,6 +168,33 @@ def validate(data: dict, where: str) -> list[str]:
     if data.get("inject") not in (None, "index", "full"):
         errors.append(f"{where}: inject must be index or full")
     return errors
+
+
+REGISTERS = ("formal", "neutral", "casual")
+CONTEXTS = ("docs", "comments", "strings", "commits", "pr", "tickets", "chat")
+
+
+def register_errors(reg, where: str) -> list[str]:
+    """register: a value, or {default?, <lang>: value, contexts?: {<context>: value | {<lang>: value}}}."""
+    if reg is None or reg in REGISTERS:
+        return []
+    bad = [f"{where}: register must be formal, neutral or casual, or an object; see docs/reference/configuration.md"]
+    if not isinstance(reg, dict):
+        return bad
+
+    def lang_map_ok(m) -> bool:
+        return isinstance(m, dict) and all(TAG_RE.match(k) and v in REGISTERS for k, v in m.items())
+    for key, value in reg.items():
+        if key == "contexts":
+            if not isinstance(value, dict) or any(c not in CONTEXTS or not (v in REGISTERS or lang_map_ok(v))
+                                                  for c, v in value.items()):
+                return [f"{where}: register.contexts keys must be {', '.join(CONTEXTS)}, with a register or a per-language map"]
+        elif key == "default" or TAG_RE.match(key):
+            if value not in REGISTERS:
+                return bad
+        else:
+            return bad
+    return []
 
 
 def read_layer(path: Path) -> dict:
@@ -334,6 +358,8 @@ def selftest() -> None:
         assert not validate({"feedback": {"enabled": False, "form_url": "https://f.example/form", "entry": "42"}}, "t")
         assert not validate({"register": {"fr": "casual", "en-CA": "formal"}}, "t") and not validate({"register": "casual"}, "t")
         assert validate({"register": "slang"}, "t") and validate({"register": {"french": "casual"}}, "t")
+        assert not validate({"register": {"default": "neutral", "fr": "casual", "contexts": {"comments": "formal", "pr": {"fr": "casual"}}}}, "t")
+        assert validate({"register": {"contexts": {"slack": "casual"}}}, "t") and validate({"register": {"contexts": {"pr": {"fr": "loud"}}}}, "t")
         assert validate({"locales": ["../../etc/passwd"]}, "t") and validate({"subagents": {"inject": "yes", "x": 1}}, "t")
         (tmp / "secret.md").write_text("s")
         assert find_glossary(root, {"glossary": "../secret.md"}) is None, "glossary escaped the repo"

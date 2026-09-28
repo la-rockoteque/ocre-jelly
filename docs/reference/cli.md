@@ -25,6 +25,7 @@ python3 $OJ/scan.py --preserve original.md < rewritten.md
 |---|---|
 | `--locale TAGS` | Comma list, for example `en-CA,fr-CA`. Default: `locales` from the config, else `en,fr`. |
 | `--glossary MD` | Glossary file. Default: from the config, else the standard names. |
+| `--context CONTEXT` | What the text is, for the register: `docs` (default), `pr`, `tickets`, `chat`, `comments`, `strings`, `commits`. |
 | `--include-quoted` | Also scan quotes, « guillemets », blockquotes and code. They are masked by default. |
 | `--preserve ORIGINAL` | Don't scan: list every number, URL, code span, version and multi-word name from ORIGINAL that is missing from stdin. Exit 1 when one is missing. |
 | `--json` | JSON output. |

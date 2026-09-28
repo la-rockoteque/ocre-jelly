@@ -128,18 +128,34 @@ def suggestion(match: str, suggest) -> str:
     return f"{match} -> {suggest}"
 
 
-def register_for(tag: str, register: str | dict | None) -> str:
-    if isinstance(register, dict):
-        return register.get(tag, register.get(tag.split("-")[0], "neutral"))
-    return register or "neutral"
+CONTEXTS = ("docs", "comments", "strings", "commits", "pr", "tickets", "chat")
 
 
-def locale_hits(text: str, target: str, tags: list[str], protected: set[str], register=None) -> list[dict]:
+def register_for(tag: str, register: str | dict | None, context: str | None = None) -> str:
+    """First match wins: context+language, context, language, default, neutral."""
+    if not register:
+        return "neutral"
+    if isinstance(register, str):
+        return register
+    lang = tag.split("-")[0]
+    ctx = (register.get("contexts") or {}).get(context) if context else None
+    for source in (ctx, register):
+        if isinstance(source, str):
+            return source
+        if isinstance(source, dict):
+            value = source.get(tag) or source.get(lang)
+            if value in REGISTERS:
+                return value
+    return register.get("default") or "neutral"
+
+
+def locale_hits(text: str, target: str, tags: list[str], protected: set[str], register=None,
+                context: str | None = None) -> list[dict]:
     hits = []
     for para in PARAGRAPH.finditer(target):
         seg, base = para.group(), para.start()
         tag = detect_language(seg, tags)
-        for sev, cat, rx, suggest in locale_patterns(tag, register_for(tag, register)):
+        for sev, cat, rx, suggest in locale_patterns(tag, register_for(tag, register, context)):
             for m in rx.finditer(seg):
                 span = text[base + m.start():base + m.end()].strip()
                 if suggest is not None and span.lower() in protected:
@@ -151,7 +167,7 @@ def locale_hits(text: str, target: str, tags: list[str], protected: set[str], re
 
 def scan(text: str, include_quoted: bool = False, aliases: dict[str, list[str]] | None = None,
          locales: list[str] | None = None, protected_terms: list[str] | None = None,
-         register: str | dict | None = None) -> list[dict]:
+         register: str | dict | None = None, context: str | None = None) -> list[dict]:
     target = text if include_quoted else mask(text)
     tags = list(locales or DEFAULT_LOCALES)
     extra = [t for t in (protected_terms or []) if t.strip()]
@@ -159,7 +175,7 @@ def scan(text: str, include_quoted: bool = False, aliases: dict[str, list[str]] 
     protected |= {w.lower() for t in extra for w in re.findall(r"\w+", t)}
     if extra:  # a protected term is never an alias to avoid either
         aliases = {a: t for a, t in (aliases or {}).items() if a.lower() not in {x.lower() for x in extra}}
-    hits = locale_hits(text, target, tags, protected, register)
+    hits = locale_hits(text, target, tags, protected, register, context)
     hits += long_sentences(text, target)
     hits += dash_paragraphs(text, target)
     hits += glossary_hits(text, target, aliases or {})
@@ -406,6 +422,13 @@ def selftest() -> None:
     assert "register-informal" in {h["category"] for h in scan(casual, locales=["fr-CA"], register={"fr": "formal"})}
     assert "register-informal" in {h["category"] for h in scan("We don't ship it.", register="formal")}
     assert "throat-clearing" in {h["category"] for h in scan("Salut! Il est important de noter que ça marche.", register={"fr": "casual"})}
+    reg = {"default": "neutral", "fr": "casual", "contexts": {"comments": "formal", "chat": {"en": "casual"}}}
+    assert register_for("fr-CA", reg, "docs") == "casual" and register_for("en-CA", reg, "docs") == "neutral"
+    assert register_for("fr-CA", reg, "comments") == "formal" and register_for("en", reg, "chat") == "casual"
+    assert register_for("fr", reg, "chat") == "casual" and register_for("en", {"default": "formal"}, "pr") == "formal"
+    assert register_for("en", None, "pr") == "neutral" and register_for("en", "casual", "comments") == "casual"
+    assert "register-informal" in {h["category"] for h in scan("We don't ship it.", register=reg, context="comments")}
+    assert "register-informal" not in {h["category"] for h in scan("We don't ship it.", register=reg, context="pr")}
     for tag in available_locales():
         for r in REGISTERS:
             locale_patterns(tag, r)  # every shipped locale compiles in every register
@@ -430,6 +453,8 @@ def main() -> None:
     ap.add_argument("--preserve", metavar="ORIGINAL", help="report tokens from ORIGINAL missing in stdin")
     ap.add_argument("--locale", help="comma list of locale tags, e.g. en-CA,fr-CA (default: config, else en,fr)")
     ap.add_argument("--no-config", action="store_true", help="ignore .claude/ocre-jelly*.json and ~/.claude/ocre-jelly.json")
+    ap.add_argument("--context", choices=CONTEXTS, default="docs",
+                    help="what the text is, for the register: docs (default), pr, chat, tickets, ...")
     ap.add_argument("--list-locales", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
@@ -463,7 +488,7 @@ def main() -> None:
         with open(glossary, encoding="utf-8") as f:
             aliases = load_glossary(read_capped(f))
     locales = parse_locales(args.locale) or cfg["locales"] or None
-    hits = scan(text, args.include_quoted, aliases, locales, cfg["protected_terms"], cfg.get("register"))
+    hits = scan(text, args.include_quoted, aliases, locales, cfg["protected_terms"], cfg.get("register"), args.context)
     if cfg["severity"]:
         import config
         hits = config.apply_severity(hits, cfg["severity"])

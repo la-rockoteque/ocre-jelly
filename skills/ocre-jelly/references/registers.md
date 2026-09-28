@@ -1,5 +1,7 @@
 # Registers
 
+The register can also depend on the context: `"register": {"default": "neutral", "contexts": {"comments": "formal", "pr": "casual"}}`. The contexts are `docs`, `comments`, `strings`, `commits`, `pr`, `tickets` and `chat`. For each piece of prose you write, use the register of its context and language; the session's Register line lists them. When you scan a PR description, a ticket or a chat post, pass `--context pr|tickets|chat` to `scan.py`.
+
 A register is how formal the prose is. Set it per language in the config: `"register": {"fr": "casual", "en": "neutral"}`, or one value for every language. Write new prose in the configured register. A rewrite keeps the source's register, whatever the config says.
 
 **Every register keeps the core rules.** No AI tells, facts preserved, one idea per sentence, one term per concept. A casual text still says something concrete, and a formal one is still plain. Only formality changes.

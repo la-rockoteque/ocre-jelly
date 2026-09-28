@@ -399,15 +399,16 @@ def parse_diff(diff: str) -> dict[str, set[int]]:
 
 def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None, all_hits: bool = False,
                 locales: list[str] | None = None, protected_terms: list[str] | None = None) -> list[dict]:
+    ctx = "docs" if ext in PROSE else "strings" if ext in STRINGS else "comments"
     if ext in PROSE:
-        hits = scan.scan(src, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)
+        hits = scan.scan(src, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER, context=ctx)
         return sorted(hits if all_hits else condense(hits), key=lambda h: (h["line"], h["severity"]))
     if ext in STRINGS:  # each string is its own paragraph, so scan values one by one
         hits = []
         for n, value in enumerate(strings_prose(src, ext)):
             if value:
                 hits += [{**h, "line": n + 1}
-                         for h in scan.scan(value, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)]
+                         for h in scan.scan(value, aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER, context=ctx)]
         return sorted(hits if all_hits else condense(hits), key=lambda h: (h["line"], h["severity"]))
     blocks = blocks_for(src, ext)
     total = src.count("\n") + 1
@@ -417,7 +418,7 @@ def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None,
         for i, text in enumerate(masked):
             if b.start - 1 + i < total:
                 prose[b.start - 1 + i] = text
-    hits = scan.scan("\n".join(prose), aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER)
+    hits = scan.scan("\n".join(prose), aliases=aliases, locales=locales, protected_terms=protected_terms, register=REGISTER, context=ctx)
     for b in blocks:
         hits += doc_hits(b)
     hits = scan.suppress(hits, src)  # markers in the raw source also cover doc-comment findings

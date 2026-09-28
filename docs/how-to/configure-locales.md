@@ -51,6 +51,35 @@ python3 $OJ/modules.py config set register '{"fr":"casual","en":"neutral"}' --pr
 | `neutral` (default) | Docs, READMEs, commits, PRs, comments | Nothing |
 | `casual` | Team chat, Slack posts, beta invitations | fr-CA anglicisms like « check » stop being findings |
 
+### By context
+
+Different artifacts can use different registers. `neutral` stays the default everywhere else:
+
+```json
+{
+  "register": {
+    "default": "neutral",
+    "contexts": {
+      "comments": "formal",
+      "pr": "casual",
+      "chat": { "fr": "casual", "en": "neutral" }
+    }
+  }
+}
+```
+
+| Context | Covers | How the scanner knows |
+|---|---|---|
+| `docs` | Docs, READMEs, markdown | `codedoc.py` on prose files; `scan.py` by default |
+| `comments` | Code comments and doc comments | `codedoc.py` on source files |
+| `strings` | UI strings in resource files | `codedoc.py` on i18n files |
+| `commits` | Commit messages | `commitmsg.py` |
+| `pr` | PR and MR descriptions, review comments | `scan.py --context pr` |
+| `tickets` | Jira, GitLab or GitHub issues | `scan.py --context tickets` |
+| `chat` | Slack or Teams posts, emails, announcements | `scan.py --context chat` |
+
+The first match wins: the context's value for the text's language, then the context's single value, then the language's value (`"fr": "casual"`), then `default`, then `neutral`.
+
 Claude writes new prose in the configured register, and a rewrite keeps the source's register. A casual French post can say « Check tes scores, pis dis-moi si ça marche », but it still can't say « Il est important de noter que ». AI-tell checks stay on in every register. The rules for each language and register are in `skills/ocre-jelly/references/registers.md`.
 
 ## Keep a word's spelling
