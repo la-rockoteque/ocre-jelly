@@ -92,6 +92,19 @@ echo "The glossary parser misses my 5-column tables" | python3 $OJ/feedback.py -
 
 The script never sends anything; the browser talks to the form when you click Submit. Text too long for a link opens the empty form, and prints the text to paste.
 
+## telemetry.py: opt-in usage statistics
+
+| Command | Does |
+|---|---|
+| `status` | On or off, the retention, and where the files are. |
+| `summary [--days N] [--json]` | Aggregated statistics. |
+| `verdicts JSON` | Record confirmed/protected counts per category, for example `'{"ste-length":{"confirmed":1,"protected":4}}'`. |
+| `send [--open]` | Print the summary as feedback text, and build the pre-filled form link. `--open` opens it; you submit it. |
+| `clear` | Delete the usage file and the debug log. |
+| `--selftest` | Run the self-test. |
+
+See [Collect usage statistics](../how-to/collect-usage-statistics.md).
+
 ## modules.py: modules, config and hooks
 
 | Command | Does |

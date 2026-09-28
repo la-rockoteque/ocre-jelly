@@ -24,12 +24,13 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 | Add support for a tool or convention | [Add a module](how-to/add-a-module.md) |
 | Add a language or a regional variant | [Add a locale](how-to/add-a-locale.md) |
 | Something doesn't work | [Troubleshoot](how-to/troubleshoot.md) |
+| Keep local usage statistics, and share them if you choose | [Collect usage statistics](how-to/collect-usage-statistics.md) |
 | Request a feature, report a bug, comment | [Send feedback](how-to/send-feedback.md), or [the form](https://forms.gle/GwKgxKB23iSKyZqr7) |
 
 ## Reference
 
 - [Configuration](reference/configuration.md): every key, its type and default, the layers, and the environment variables.
-- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `commitmsg.py`, `feedback.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
+- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `commitmsg.py`, `feedback.py`, `telemetry.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
 - [Checks](reference/checks.md): every finding category, its severity and its languages. *Generated.*
 - [Modules](reference/modules.md): all 39 modules, their defaults and triggers. *Generated.*
 - [Locales](reference/locales.md): the 10 locales and what each one checks. *Generated.*

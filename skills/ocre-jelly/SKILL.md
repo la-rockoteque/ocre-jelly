@@ -21,6 +21,7 @@ Repair concrete AI-writing defects. Leave everything else alone. A no-op beats a
 - `modules ...`: list, enable, disable or export modules. See [Modules](#modules).
 - `commit [message or file]`: check a commit message's shape and prose with `scripts/commitmsg.py`. See [Commits and PRs](#commits-and-prs).
 - `feedback [text]`: send a feature request, a bug or a comment to the ocre-jelly author. See [Feedback](#feedback).
+- `stats [summary|send|clear]`: the user's opt-in usage statistics. See [Usage statistics](#usage-statistics-opt-in).
 - `config ...`: show or change settings (`show`, `path`, `init`, `set`). Ask whether a change is for the team (`--project`, committed), for this clone only (`--local`) or for every repo (the default user layer).
 
 Input is inline text or a file path the user gives. Only read files the user named. Never go looking for writing samples elsewhere on disk.
@@ -115,6 +116,13 @@ When the user asks for something ocre-jelly doesn't do (a language, a locale, a 
    ```
    Pass the text as an argument or on stdin, never interpolated unquoted into the shell. The script opens the form in the browser, pre-filled. Tell the user that nothing is sent until they click **Submit** there.
 5. Never submit the form yourself, and never send feedback without the user's confirmation. If `feedback.enabled` is false in the config, say that feedback is turned off in this repo.
+
+## Usage statistics (opt-in)
+
+Telemetry is off unless the user turned it on in their user or local config (`telemetry.enabled`); `telemetry.py status` says which. When it is on, the scanners and hooks record counts by themselves. Two things are yours:
+
+- After you classify an audit's candidates, record the verdicts in one call: `python3 <this-skill-dir>/scripts/telemetry.py verdicts '{"<category>":{"confirmed":N,"protected":M}}'`. Skip it when telemetry is off.
+- When the user asks to see or share their statistics, run `telemetry.py summary`. To share, run `telemetry.py send`, show the user the exact text it prints, and ask for confirmation (AskUserQuestion). Only then run it with `--open`; the user submits the form themselves. Never send the debug log, and never turn telemetry on for the user: tell them the command instead.
 
 ## Modules
 

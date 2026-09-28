@@ -57,11 +57,16 @@ DEFAULTS = {
         "form_url": "https://docs.google.com/forms/d/e/1FAIpQLSdnhduOn5MnbEBo6Dp44mNfiXvTkNj2PKmJE-5opP9_MwlYDg/viewform",
         "entry": "1018508464",      # the form's paragraph field (entry.<id>)
     },
+    "telemetry": {                 # telemetry.py: opt-in, local-only counts; see its docstring
+        "enabled": False,           # only the user and local layers can turn it on
+        "debug": False,             # also keep error tracebacks in ~/.claude/ocre-jelly/debug.log
+        "retention_days": 30,
+    },
 }
 
 TYPES = {"enabled": bool, "locales": list, "glossary": (str, type(None)), "modules": dict, "inject": str,
          "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list,
-         "commits": dict, "feedback": dict}
+         "commits": dict, "feedback": dict, "telemetry": dict}
 
 
 def claude_dir() -> Path:
@@ -137,6 +142,13 @@ def validate(data: dict, where: str) -> list[str]:
             errors.append(f"{where}: feedback.entry must be the numeric field id, as a string")
         elif key not in ("enabled", "form_url", "entry"):
             errors.append(f"{where}: unknown key feedback.{key}")
+    for key, value in (data.get("telemetry") or {}).items():
+        if key in ("enabled", "debug") and not isinstance(value, bool):
+            errors.append(f"{where}: telemetry.{key} must be true or false")
+        elif key == "retention_days" and (not isinstance(value, int) or isinstance(value, bool) or value < 1):
+            errors.append(f"{where}: telemetry.retention_days must be a positive integer")
+        elif key not in ("enabled", "debug", "retention_days"):
+            errors.append(f"{where}: unknown key telemetry.{key}")
     if data.get("inject") not in (None, "index", "full"):
         errors.append(f"{where}: inject must be index or full")
     return errors
@@ -173,11 +185,18 @@ def load(root: Path | None = None) -> dict:
     """Merged config, plus "_sources": which layer set each top-level key."""
     root = root or project_root()
     cfg, sources = copy.deepcopy(DEFAULTS), {}
+    consent = {}  # telemetry on/off per layer
     for layer in LAYERS:
         data = read_layer(layer_path(layer, root))
         data.pop("$schema", None)
         cfg = merge(cfg, data)
         sources.update({k: layer for k in data})
+        consent[layer] = (data.get("telemetry") or {})
+    # Consent is personal: only the user or local layer can turn telemetry (or debug) on.
+    # A committed project layer can only turn it off.
+    for key in ("enabled", "debug"):
+        personal = consent["local"].get(key, consent["user"].get(key, False))
+        cfg["telemetry"][key] = bool(personal) and consent["project"].get(key) is not False
     if os.environ.get("OCRE_JELLY", "").lower() == "off":
         cfg["enabled"], sources["enabled"] = False, "env"
     if os.environ.get("OCRE_JELLY_SUBAGENT_MATCHER"):
@@ -279,6 +298,14 @@ def selftest() -> None:
 
         assert validate({"commits": {"enforce": "maybe"}}, "t") and not validate({"commits": {"enforce": "block", "types": ["feat"]}}, "t")
         assert load(root)["commits"]["enforce"] == "warn"
+        update_layer("project", root, lambda d: d.update({"telemetry": {"enabled": True, "debug": True}}))
+        assert load(root)["telemetry"]["enabled"] is False, "a committed config turned telemetry on"
+        update_layer("local", root, lambda d: d.update({"telemetry": {"enabled": True}}))
+        assert load(root)["telemetry"]["enabled"] is True and load(root)["telemetry"]["debug"] is False
+        update_layer("project", root, lambda d: d.update({"telemetry": {"enabled": False}}))
+        assert load(root)["telemetry"]["enabled"] is False, "the project layer must be able to turn it off"
+        update_layer("project", root, lambda d: d.pop("telemetry"))
+        update_layer("local", root, lambda d: d.pop("telemetry"))
         assert validate({"feedback": {"form_url": "http://evil"}}, "t") and validate({"feedback": {"entry": "x1"}}, "t")
         assert not validate({"feedback": {"enabled": False, "form_url": "https://f.example/form", "entry": "42"}}, "t")
         assert validate({"locales": ["../../etc/passwd"]}, "t") and validate({"subagents": {"inject": "yes", "x": 1}}, "t")

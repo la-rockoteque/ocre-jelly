@@ -1,6 +1,6 @@
 # Configuration
 
-ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`, `feedback`) merge key by key; every other value replaces the one before it.
+ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`, `feedback`, `telemetry`) merge key by key, except that `telemetry.enabled` and `telemetry.debug` follow the consent rule below; every other value replaces the one before it.
 
 | # | Layer | File | Commit it? | Written by |
 |---|---|---|---|---|
@@ -38,6 +38,9 @@ The repo is the nearest parent folder that contains `.git`. The JSON Schema is `
 | `feedback.enabled` | boolean | `true` | `false` makes `/ocre-jelly feedback` refuse, and stops Claude from offering it. |
 | `feedback.form_url` | https URL | the ocre-jelly form | The form's `viewform` URL. Point it at your team's own form if you like. |
 | `feedback.entry` | digits, as a string | `"1018508464"` | The id of the form's paragraph field, from a pre-filled link (`entry.<id>=`). |
+| `telemetry.enabled` | boolean | `false` | Record local usage statistics. **Only the user and local layers can turn it on**; the project layer can only turn it off. See [Collect usage statistics](../how-to/collect-usage-statistics.md). |
+| `telemetry.debug` | boolean | `false` | Also keep error tracebacks in `~/.claude/ocre-jelly/debug.log`. Same consent rule. |
+| `telemetry.retention_days` | integer ≥ 1 | `30` | Older events are dropped. |
 | `commits.types` | list of strings | `[]` | Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert. |
 
 ## Environment variables

@@ -35,6 +35,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -226,10 +227,15 @@ def main() -> None:
         message = scan.read_capped(sys.stdin)
     convention = convention_for({**settings, **({"convention": args.convention} if args.convention else {})},
                                 active_modules(cfg))
+    started = time.perf_counter()
     hits = check(message, settings, convention, kwargs)
     if cfg.get("severity"):
         import config
         hits = config.apply_severity(hits, cfg["severity"])
+    if not args.no_config:
+        import telemetry
+        telemetry.record("commitmsg", started, hits, convention=convention, enforce=enforce,
+                         hook=args.hook, blocked=bool(exit_code(hits, enforce)))
 
     out = sys.stderr if args.hook else sys.stdout  # git shows a hook's stderr to the committer
     if args.json:
@@ -248,4 +254,8 @@ if __name__ == "__main__":
     try:
         main()
     except ValueError as e:
+        scan._record_error(e)
         sys.exit(f"commitmsg.py: {e}")
+    except Exception as e:
+        scan._record_error(e)
+        raise

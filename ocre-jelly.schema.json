@@ -195,6 +195,27 @@
           "description": "The id of the form's paragraph field (entry.<id>)."
         }
       }
+    },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Opt-in, local-only usage statistics. Only the user and local layers can turn enabled or debug on; the project layer can only turn them off.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Keep error tracebacks in ~/.claude/ocre-jelly/debug.log."
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 30
+        }
+      }
     }
   }
 }

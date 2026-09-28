@@ -45,6 +45,7 @@ import json
 import os
 import re
 import sys
+import time
 
 sys.dont_write_bytecode = True  # keep the installed plugin folder clean
 from pathlib import Path
@@ -205,7 +206,12 @@ def run_hook(event: str) -> None:
                 return
         except re.error:
             pass  # a bad regex fails open, like ponytail
+    started = time.perf_counter()
     text = session_rules(root, cfg)
+    import telemetry
+    telemetry.record("hook", started, event=event, words=len(text.split()), locales=cfg["locales"] or None,
+                     modules_active=len(text.split("Active modules.", 1)[1].splitlines()) - 1 if "Active modules." in text else 0,
+                     agent=str(payload.get("agent_type") or "") or None if event == "subagent-start" else None)
     if event == "subagent-start":  # SubagentStart drops raw stdout; it needs this JSON form
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SubagentStart", "additionalContext": text}}))
     else:
@@ -472,6 +478,11 @@ def main() -> None:
             return run_hook(args.event)
         except Exception as e:  # a broken module or config must never break session start
             print(f"ocre-jelly hook error: {e}", file=sys.stderr)
+            try:
+                import telemetry
+                telemetry.error("hook", e)
+            except Exception:  # noqa: BLE001
+                pass
             return
     if args.cmd == "list":
         return run_list()

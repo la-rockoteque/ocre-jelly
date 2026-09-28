@@ -30,6 +30,7 @@ import io
 import json
 import re
 import sys
+import time
 
 sys.dont_write_bytecode = True  # keep the installed plugin folder clean
 import tokenize
@@ -582,6 +583,7 @@ def main() -> None:
         files = [f for f in files if not config.ignored(f, Path(cfg["_root"]), cfg["ignore_paths"])]
         if len(files) < len(args.files):
             print(f"-- skipped {len(args.files) - len(files)} file(s) matching ignore_paths", file=sys.stderr)
+    started = time.perf_counter()
     sources = [(p, Path(p).suffix.lower()) for p in files] or [("<stdin>", (args.lang or ".js").lower())]
     results = []
     for name, ext in sources:
@@ -598,6 +600,11 @@ def main() -> None:
     if cfg["severity"]:
         import config
         results = config.apply_severity(results, cfg["severity"])
+    if not args.no_config:
+        import telemetry
+        telemetry.record("codedoc", started, results, locales=cfg["locales"] or None,
+                         ext=telemetry.extensions([n if n != "<stdin>" else f"x{e}" for n, e in sources]),
+                         files=len(sources), skipped=len(args.files) - len(files))
     if args.json:
         return print(json.dumps(results, indent=2))
     multi = len(sources) > 1
@@ -612,4 +619,8 @@ if __name__ == "__main__":
     try:
         main()
     except ValueError as e:  # bad locale tag or glossary: a clear message, not a traceback
+        scan._record_error(e)
         sys.exit(f"{Path(__file__).name}: {e}")
+    except Exception as e:
+        scan._record_error(e)
+        raise

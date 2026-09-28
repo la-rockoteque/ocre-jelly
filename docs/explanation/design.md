@@ -59,6 +59,7 @@ The unslop project that inspired ocre-jelly harvested chat transcripts, opened p
 - Exports never overwrite a file that ocre-jelly didn't generate, without `--force`.
 - Every regex is bounded. The self-tests run 200 KB worst cases.
 - The hooks catch every error. A broken module or config can't break session start.
+- Usage statistics are off by default, local only, and counts only (never text, matches, paths or repo names). Only the person can turn them on; a committed config can only turn them off. Sharing sends an aggregated summary, shown in full first, through the form the person submits.
 - `--same-code` guards doc rewrites with two independent checks, so one parser mistake can't hide a code change.
 
 ## Generated reference

@@ -22,6 +22,7 @@ import json
 import re
 import runpy
 import sys
+import time
 from pathlib import Path
 
 sys.dont_write_bytecode = True  # keep the installed plugin folder clean
@@ -365,6 +366,7 @@ def main() -> None:
             print(f"{tag:<6} {load_locale(tag).get('SUMMARY', '')}")
         return
 
+    started = time.perf_counter()
     text = read_capped(sys.stdin)
 
     if args.preserve:
@@ -387,6 +389,9 @@ def main() -> None:
     if cfg["severity"]:
         import config
         hits = config.apply_severity(hits, cfg["severity"])
+    if not args.no_config:
+        import telemetry
+        telemetry.record("scan", started, hits, locales=locales, chars=len(text), glossary=bool(aliases))
     if args.json:
         print(json.dumps(hits, indent=2))
     else:
@@ -396,8 +401,18 @@ def main() -> None:
         print(f"-- {len(hits)} candidates ({hard} hard). Candidates only; confirm in context.")
 
 
+def _record_error(e: BaseException) -> None:
+    if "--no-config" not in sys.argv:
+        import telemetry
+        telemetry.error(Path(sys.argv[0]).stem, e)
+
+
 if __name__ == "__main__":
     try:
         main()
     except ValueError as e:  # bad locale tag or glossary: a clear message, not a traceback
+        _record_error(e)
         sys.exit(f"{Path(__file__).name}: {e}")
+    except Exception as e:
+        _record_error(e)
+        raise
