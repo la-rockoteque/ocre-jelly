@@ -39,6 +39,7 @@ One line per run in `~/.claude/ocre-jelly/usage.jsonl`:
 | Locales | `en-CA` |
 | Hook size | 177 words, 10 modules active |
 | Commit checks | convention, enforcement, blocked or not |
+| Rewrite gates | `--preserve` and `--same-code`: passed or failed, and how many facts went missing |
 | Error types | `ValueError` |
 
 **Never recorded:** the text, the matches, file names, folders, repo names, people, or anything you typed.

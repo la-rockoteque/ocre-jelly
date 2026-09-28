@@ -7,6 +7,7 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 ### Added
 
 - Inline suppression: `ocre-jelly: ignore [categories]` (the next line, or its own line as a trailing comment) and `ocre-jelly: off` / `on` blocks, in any comment syntax.
+- Usage statistics record the rewrite gates (`--preserve`, `--same-code`): passed or failed.
 - `codedoc.py --format gitlab` (a Code Quality report for merge requests) and `--fail-on hard|soft`.
 - `codedoc.py --diff`: read a unified diff on stdin, and report only findings on added lines (prose files included).
 - Brand icon in `assets/`, shown in the README and referenced by the plugin manifest.

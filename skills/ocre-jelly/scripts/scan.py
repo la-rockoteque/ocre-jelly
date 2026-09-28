@@ -427,6 +427,9 @@ def main() -> None:
     if args.preserve:
         with open(args.preserve, encoding="utf-8") as f:
             missing = missing_tokens(read_capped(f), text)
+        if not args.no_config:
+            import telemetry
+            telemetry.record("gate", gate="preserve", ok=not missing, missing=len(missing))
         if args.json:
             print(json.dumps({"missing": missing}))
         else:

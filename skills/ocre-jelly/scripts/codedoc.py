@@ -641,6 +641,9 @@ def main() -> None:
     if args.same_code:
         a, b = (Path(p) for p in args.same_code)
         problem = same_code(a.read_text(encoding="utf-8"), b.read_text(encoding="utf-8"), a.suffix.lower())
+        if not args.no_config:
+            import telemetry
+            telemetry.record("gate", gate="same-code", ok=problem is None, ext={a.suffix.lower() or "(none)": 1})
         print(problem or "code unchanged")
         sys.exit(1 if problem else 0)
 

@@ -157,6 +157,7 @@ def summarize(evts: list[dict]) -> dict:
     exts, locales, ms = collections.Counter(), collections.Counter(), collections.defaultdict(list)
     verdicts: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     words, blocked = [], 0
+    gates: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
     for e in evts:
         counts.update(e.get("counts", {}))
         severity.update(e.get("severity", {}))
@@ -169,6 +170,8 @@ def summarize(evts: list[dict]) -> dict:
         if "words" in e:
             words.append(e["words"])
         blocked += bool(e.get("blocked"))
+        if e.get("gate"):
+            gates[e["gate"]]["passed" if e.get("ok") else "failed"] += 1
         for cat, v in (e.get("verdicts") or {}).items():
             verdicts[cat].update({k: n for k, n in v.items() if k in ("confirmed", "protected") and isinstance(n, int)})
     precision = {cat: {"confirmed": v["confirmed"], "protected": v["protected"],
@@ -188,6 +191,7 @@ def summarize(evts: list[dict]) -> dict:
         "locales": dict(locales),
         "hook_words_median": sorted(words)[len(words) // 2] if words else None,
         "commits_blocked": blocked,
+        "rewrite_gates": {g: dict(c) for g, c in gates.items()},
         "errors": dict(errors),
     }
 
@@ -206,7 +210,10 @@ def summary_text(s: dict) -> str:
             f"{c} {v['confirmed']}/{v['protected']}" for c, v in sorted(s["verdicts"].items())))
     lines += [f"File types: {kv(s['file_types'])}", f"Locales: {kv(s['locales'])}",
               f"Hook words (median): {s['hook_words_median'] if s['hook_words_median'] is not None else 'n/a'}",
-              f"Commits blocked: {s['commits_blocked']}", f"Errors: {kv(s['errors'])}"]
+              f"Commits blocked: {s['commits_blocked']}",
+              "Rewrite gates (passed/failed): " + (", ".join(f"{g} {c.get('passed', 0)}/{c.get('failed', 0)}"
+                                                           for g, c in sorted(s.get("rewrite_gates", {}).items())) or "none"),
+              f"Errors: {kv(s['errors'])}"]
     return "\n".join(lines)
 
 
@@ -228,6 +235,8 @@ def selftest() -> None:
         record("codedoc", ext=extensions(["/Users/me/acme/src/Billing.cs", "a/b.ts", "c.ts"]))
         record("verdict", verdicts={"em-dash": {"confirmed": 1, "protected": 3}})
         record("commitmsg", blocked=True)
+        record("gate", gate="preserve", ok=False, missing=2)
+        record("gate", gate="preserve", ok=True, missing=0)
         try:
             raise KeyError("boom")
         except KeyError as e:
@@ -235,6 +244,8 @@ def selftest() -> None:
         raw = usage_file().read_text()
         assert "SECRET TEXT" not in raw and "acme" not in raw and "Billing" not in raw, raw
         s = summarize(events())
+        assert s["rewrite_gates"] == {"preserve": {"failed": 1, "passed": 1}}, s["rewrite_gates"]
+        assert "preserve 1/1" in summary_text(s)
         assert s["runs"]["scan"] == 2 and s["findings_by_category"] == {"throat-clearing": 1, "em-dash": 1}
         assert s["file_types"] == {".cs": 1, ".ts": 2} and s["commits_blocked"] == 1 and s["errors"] == {"KeyError": 1}
         assert s["verdicts"]["em-dash"] == {"confirmed": 1, "protected": 3, "confirmed_rate": 0.25}
@@ -246,7 +257,7 @@ def selftest() -> None:
         with usage_file().open("a") as f:
             f.write(json.dumps(old) + "\nnot json\n")
         prune(30)
-        assert all(e["ts"] > "2001" for e in events()) and len(events()) == 5
+        assert all(e["ts"] > "2001" for e in events()) and len(events()) == 7
         _settings = None
     print("selftest ok")
 
