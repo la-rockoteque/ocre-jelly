@@ -4,6 +4,10 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 
 ## [Unreleased]
 
+### Added
+
+- Brand icon in `assets/`, shown in the README and referenced by the plugin manifest.
+
 ## [0.1.0] - 2026-09-28
 
 ### Added

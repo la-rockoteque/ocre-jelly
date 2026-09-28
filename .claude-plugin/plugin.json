@@ -46,5 +46,6 @@
         ]
       }
     ]
-  }
+  },
+  "icon": "./assets/ocre-jelly-128.png"
 }

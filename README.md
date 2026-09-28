@@ -1,4 +1,8 @@
-# ocre-jelly
+<p align="center">
+  <img src="assets/ocre-jelly-512.png" alt="ocre-jelly icon: a green jelly wrapped around a page of text, with some lines highlighted green" width="200">
+</p>
+
+<h1 align="center">ocre-jelly</h1>
 
 Prose mode for Claude Code. It removes AI writing patterns from the text your agent writes and reviews: docs, READMEs, commit bodies, PR descriptions, tickets, code comments, doc comments and UI strings.
 
@@ -105,6 +109,7 @@ ocre-jelly reads `docs/ubiquitous-language.md` or `UBIQUITOUS-LANGUAGE.md` (or t
 
 ```
 .claude-plugin/        plugin and marketplace manifests (hooks: SessionStart, SubagentStart)
+assets/                brand icon: ocre-jelly.png (1254 px master), -512 (README), -128 (plugin icon)
 skills/ocre-jelly/
   SKILL.md             the skill: audit, rewrite, docs, modules, config
   core-rules.md        the always-on rules injected by the hooks
