@@ -50,6 +50,8 @@ Fix a placeholder by writing the real text (rules 1 to 4), or by deleting the co
 
 ## Running docs mode
 
+For a branch or a PR, audit only what changed: `git diff <base>... | python3 <this-skill-dir>/scripts/codedoc.py --diff`.
+
 For `docs` mode, and whenever the user asks to review or fix comments or doc comments in source files:
 
 1. Read [references/code-docs.md](code-docs.md), and follow the active doc-convention modules (`modules.py rules`).

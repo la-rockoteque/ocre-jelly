@@ -41,6 +41,7 @@ python3 $OJ/codedoc.py src/api/*.ts
 python3 $OJ/codedoc.py --json --all src/**/*.cs
 python3 $OJ/codedoc.py --lang .py < snippet.py
 python3 $OJ/codedoc.py --same-code original.ts rewritten.ts
+git diff main... | python3 $OJ/codedoc.py --diff
 ```
 
 | Option | Meaning |
@@ -50,6 +51,7 @@ python3 $OJ/codedoc.py --same-code original.ts rewritten.ts
 | `--locale TAGS` | As in `scan.py`. A locale in a resource file's path wins. |
 | `--glossary MD` | As in `scan.py`. |
 | `--all` | List every long sentence and every alias use, instead of a summary per file. |
+| `--diff` | Read a unified diff on stdin (`git diff`, `git diff main...`, a PR's `.diff`), and report only findings on added lines. Each changed file is scanned whole, for context. Markdown, text, reST and AsciiDoc files go through the prose checks. Deleted files are skipped. |
 | `--same-code ORIGINAL REWRITTEN` | Exit 0 and print `code unchanged` only when the two files differ in comments alone. Exit 1 otherwise. |
 | `--json`, `--no-config`, `--selftest` | As in `scan.py`. |
 

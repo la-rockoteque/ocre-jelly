@@ -47,6 +47,7 @@ HASH_FAMILY = {".rb", ".sh", ".bash", ".zsh", ".pl", ".pm", ".r", ".yaml", ".yml
                ".tf", ".ps1", ".nim", ".cr"}
 PYTHON = {".py", ".pyi"}
 STRINGS = {".json", ".arb", ".po", ".pot", ".resx", ".properties", ".strings", ".xlf", ".xliff"}
+PROSE = {".md", ".mdx", ".markdown", ".txt", ".rst", ".adoc"}  # scanned whole, like scan.py (used by --diff)
 
 # One regex per resource format; group "v" is the user-facing text.
 STRING_VALUE = {
@@ -310,6 +311,7 @@ def doc_hits(b: Block) -> list[dict]:
         summary = first_sentence(mask_doc(raw))
         if summary and echoes(summary, split_ident(b.decl)):
             hit(0, "hard", "echo-doc", f"{summary} <- {b.decl[:40]}")
+            hits[-1]["span"] = [b.start, b.start + len(b.lines) - 1]  # the whole block, for --diff
     return hits
 
 
@@ -352,8 +354,34 @@ def condense(hits: list[dict]) -> list[dict]:
     return fold_aliases(cap_length(hits))
 
 
+def parse_diff(diff: str) -> dict[str, set[int]]:
+    """Added line numbers per file, from a unified diff (git diff, git show, a PR's .diff)."""
+    added: dict[str, set[int]] = {}
+    path, line = None, 0
+    for raw in diff.split("\n"):
+        if raw.startswith("+++ "):
+            name = raw[4:].split("\t")[0].strip().strip('"')
+            path = None if name == "/dev/null" else (name[2:] if name[:2] in ("b/", "w/", "i/") else name)
+            if path is not None:
+                added.setdefault(path, set())
+        elif raw.startswith("@@"):
+            m = re.match(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@", raw)
+            line = int(m.group(1)) if m else 0
+        elif path is None or raw.startswith(("--- ", "diff ", "index ", "\\")):
+            continue
+        elif raw.startswith("+"):
+            added[path].add(line)
+            line += 1
+        elif raw.startswith(" ") or raw == "":
+            line += 1
+    return {p: lines for p, lines in added.items() if lines}
+
+
 def scan_source(src: str, ext: str, aliases: dict[str, list[str]] | None = None, all_hits: bool = False,
                 locales: list[str] | None = None, protected_terms: list[str] | None = None) -> list[dict]:
+    if ext in PROSE:
+        hits = scan.scan(src, aliases=aliases, locales=locales, protected_terms=protected_terms)
+        return sorted(hits if all_hits else condense(hits), key=lambda h: (h["line"], h["severity"]))
     if ext in STRINGS:  # each string is its own paragraph, so scan values one by one
         hits = []
         for n, value in enumerate(strings_prose(src, ext)):
@@ -529,6 +557,20 @@ export function ttl(key: string): number { const url = "http://x.io//not-a-comme
     folded = fold_aliases([{"line": n, "severity": "soft", "category": "glossary-alias", "match": "ligne -> Item"} for n in (4, 9, 2)])
     assert len(folded) == 1 and folded[0]["match"] == "ligne -> Item (x3, first at L2)", folded
 
+    diff = (
+        "diff --git a/docs/a.md b/docs/a.md\n--- a/docs/a.md\n+++ b/docs/a.md\n@@ -1,3 +1,4 @@\n"
+        " keep\n-old line\n+Here's the thing: new\n+second new\n unchanged\n\\ No newline at end of file\n"
+        "diff --git a/gone.md b/gone.md\n--- a/gone.md\n+++ /dev/null\n@@ -1 +0,0 @@\n-bye\n"
+        "diff --git a/n.ts b/n.ts\nnew file mode 100644\n--- /dev/null\n+++ b/n.ts\n@@ -0,0 +1,2 @@\n+// x\n+const y = 1\n"
+        "diff --git a/old.md b/new name.md\nrename from old.md\n--- a/old.md\n+++ \"b/new name.md\"\n@@ -5,2 +7,3 @@\n ctx\n+added\n ctx\n"
+    )
+    assert parse_diff(diff) == {"docs/a.md": {2, 3}, "n.ts": {1, 2}, "new name.md": {8}}, parse_diff(diff)
+    md = "Clean line.\nHere's the thing: added.\nLet's dive in, old text.\n"
+    block = [h for h in scan_source("/**\n * Gets the user.\n * More.\n */\nfunction getUser() {}\n", ".ts") if h["category"] == "echo-doc"]
+    assert block and block[0]["span"] == [1, 4], block
+    kept = [h for h in scan_source(md, ".md", all_hits=True) if h["line"] in {2}]
+    assert [h["category"] for h in kept] == ["throat-clearing"], kept
+
     go = "// Parse parses.\nfunc Parse() {}\n"
     assert [h["category"] for h in scan_source(go, ".go")] == ["echo-doc"]
 
@@ -557,6 +599,8 @@ def main() -> None:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--all", action="store_true", help="list every long sentence and every alias use, not a summary")
     ap.add_argument("--same-code", nargs=2, metavar=("ORIGINAL", "REWRITTEN"))
+    ap.add_argument("--diff", action="store_true",
+                    help="read a unified diff on stdin; report only findings on added lines (prose files included)")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
 
@@ -578,6 +622,17 @@ def main() -> None:
         with open(glossary, encoding="utf-8") as f:
             aliases = scan.load_glossary(scan.read_capped(f))
     files = args.files
+    only: dict[str, set[int]] = {}  # --diff: file -> added lines
+    if args.diff:
+        root = Path(cfg.get("_root") or Path.cwd())
+        supported = C_FAMILY | HASH_FAMILY | PYTHON | STRINGS | PROSE
+        for rel, lines in parse_diff(scan.read_capped(sys.stdin)).items():
+            full = root / rel
+            if Path(rel).suffix.lower() in supported and full.is_file() and root.resolve() in full.resolve().parents:
+                only[str(full)] = lines
+        files = args.files = list(only)
+        if not files:
+            return print("-- no added lines in supported files")
     if cfg.get("_root") and cfg.get("ignore_paths"):
         import config
         files = [f for f in files if not config.ignored(f, Path(cfg["_root"]), cfg["ignore_paths"])]
@@ -595,8 +650,15 @@ def main() -> None:
         locales = scan.parse_locales(args.locale) or cfg["locales"] or None
         if ext in STRINGS:
             locales = locale_from_path(name, scan.available_locales()) or locales
-        results += [{**h, "file": name}
-                    for h in scan_source(src, ext, aliases, args.all, locales, cfg["protected_terms"])]
+        if name in only:  # scan the whole file for context, keep what the diff added
+            lines = only[name]
+            hits = [h for h in scan_source(src, ext, aliases, True, locales, cfg["protected_terms"])
+                    if h["line"] in lines or ("span" in h and any(h["span"][0] <= n <= h["span"][1] for n in lines))]
+            hits = hits if args.all else condense(hits)
+            name = str(Path(name).relative_to(Path(cfg.get("_root") or Path.cwd())))
+        else:
+            hits = scan_source(src, ext, aliases, args.all, locales, cfg["protected_terms"])
+        results += [{**h, "file": name} for h in hits]
     if cfg["severity"]:
         import config
         results = config.apply_severity(results, cfg["severity"])

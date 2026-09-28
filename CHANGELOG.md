@@ -6,6 +6,7 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 
 ### Added
 
+- `codedoc.py --diff`: read a unified diff on stdin, and report only findings on added lines (prose files included).
 - Brand icon in `assets/`, shown in the README and referenced by the plugin manifest.
 - User documentation in `docs/`: a getting-started tutorial, nine how-to guides, the configuration, command-line and glossary-format reference, and explanations of the writing standards and the design.
 - `gen_docs.py` generates the modules, locales and checks reference pages from the code. `setup.sh --check` fails when they are stale.

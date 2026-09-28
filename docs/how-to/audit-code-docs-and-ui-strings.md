@@ -17,6 +17,17 @@ python3 $OJ/codedoc.py src/api/*.ts
 python3 $OJ/codedoc.py --json src/**/*.cs > findings.json
 ```
 
+## Only what changed
+
+On an existing repo, check only the lines you added:
+
+```bash
+git diff | python3 $OJ/codedoc.py --diff             # uncommitted changes
+git diff main... | python3 $OJ/codedoc.py --diff     # a branch, for a PR
+```
+
+It scans each changed file whole, so the checks keep their context, then reports only findings on added lines. A doc-comment finding such as `echo-doc` counts when the diff touches any line of the block. Legacy prose you didn't touch stays quiet, so the repo needs no baseline. Markdown and text files in the diff get the prose checks too.
+
 ## What it reads
 
 | Source | What is scanned | What is masked |
