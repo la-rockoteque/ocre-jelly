@@ -2,7 +2,7 @@
 
 # Modules
 
-38 modules: 31 rules modules and 7 export modules. Turn one on or off with `modules.py enable|disable <name> [--project|--local]`, or set it in the `modules` map of the [configuration](configuration.md). `modules.py list` shows the state of each one in the current repo, and why.
+39 modules: 31 rules modules and 8 export modules. Turn one on or off with `modules.py enable|disable <name> [--project|--local]`, or set it in the `modules` map of the [configuration](configuration.md). `modules.py list` shows the state of each one in the current repo, and why.
 
 - **rules** modules add one index line to the session. The agent reads the module file when the work matches its trigger.
 - **export** modules write a file for another tool when you run `modules.py export`.
@@ -27,6 +27,7 @@
 | [`ecc`](../../skills/ocre-jelly/modules/ecc.md) | rules | auto | `everything-claude-code` | output of doc-updater, /update-docs or /update-codemaps | everything-claude-code - doc-updater, /update-docs, /update-codemaps |
 | [`gherkin`](../../skills/ocre-jelly/modules/gherkin.md) | rules | auto | `*.feature`, `*/*.feature` | writing or editing Gherkin .feature files | Gherkin / BDD scenario wording |
 | [`ghostdoc`](../../skills/ocre-jelly/modules/ghostdoc.md) | rules | off | — | GhostDoc-generated .NET XML docs | Opinions for GhostDoc-generated .NET XML docs |
+| [`git-hook`](../../skills/ocre-jelly/modules/git-hook.md) | export | off | — | writes `.git/hooks/commit-msg` | git commit-msg hook that runs commitmsg.py (commits.enforce decides warn or block) |
 | [`gitmoji`](../../skills/ocre-jelly/modules/gitmoji.md) | rules | auto | `.gitmojirc.json`, `.gitmoji*` | writing a commit message in a gitmoji repo | gitmoji commit prefixes |
 | [`godoc`](../../skills/ocre-jelly/modules/godoc.md) | rules | auto | `go.mod`, `*/go.mod` | Go doc comments | Go doc comment conventions |
 | [`javadoc`](../../skills/ocre-jelly/modules/javadoc.md) | rules | auto | `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `settings.gradle.kts`, `*/pom.xml`, `*/build.gradle`, `*/build.gradle.kts` | Javadoc in .java files | Javadoc conventions for Java |

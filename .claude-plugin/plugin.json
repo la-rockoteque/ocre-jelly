@@ -1,7 +1,7 @@
 {
   "name": "ocre-jelly",
   "version": "0.1.0",
-  "description": "Prose mode for AI agents: removes AI writing patterns from docs, READMEs, commits, PRs, code comments and UI strings, under ASD-STE100 / French plain-language rules, the project's ubiquitous language and its locales. Modular: 38 switchable integrations and conventions, 10 locales.",
+  "description": "Prose mode for AI agents: removes AI writing patterns from docs, READMEs, commits, PRs, code comments and UI strings, under ASD-STE100 / French plain-language rules, the project's ubiquitous language and its locales. Modular: 39 switchable integrations and conventions, 10 locales.",
   "author": {
     "name": "Rocko Bernier",
     "email": "vbernier@nexapp.ca"

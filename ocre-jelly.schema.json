@@ -123,6 +123,56 @@
         "type": "string"
       },
       "description": "Words never flagged or respelled."
+    },
+    "commits": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Commit-message checks (commitmsg.py and the commit-msg hook).",
+      "properties": {
+        "enforce": {
+          "type": "string",
+          "enum": [
+            "off",
+            "warn",
+            "block"
+          ],
+          "default": "warn",
+          "description": "off: no output. warn: print findings, never block. block: exit 1 (reject the commit) on a hard finding."
+        },
+        "convention": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "conventional",
+            "gitmoji",
+            "none"
+          ],
+          "default": "auto",
+          "description": "auto follows the conventional-commits and gitmoji modules."
+        },
+        "subject_max": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 72
+        },
+        "subject_target": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 50
+        },
+        "body_wrap": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 72
+        },
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert."
+        }
+      }
     }
   }
 }

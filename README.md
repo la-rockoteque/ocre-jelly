@@ -9,8 +9,9 @@ Prose mode for Claude Code. It removes AI writing patterns from the text your ag
 - **Prose authority per language:** ASD-STE100 for English, and a French plain-language standard (ISO 24495-1, Français Rationalisé principles, OQLF usage).
 - **Ubiquitous language:** the project's glossary is the vocabulary. Its Terms are protected, and aliases to avoid are flagged.
 - **Locales:** regional spelling, terms and typography for en-US, en-GB, en-CA, en-AU, fr-CA, fr-FR, fr-BE and fr-CH.
+- **Commit messages:** subject, body wrap, Conventional Commits or gitmoji, and the prose of the body, as a `commit-msg` hook that warns or blocks (`commits.enforce`).
 - **Code docs:** JSDoc, TSDoc, Javadoc, KDoc, .NET XML docs, docstrings, godoc, rustdoc, Doxygen, PHPDoc, Swift and YARD, plus GhostDoc and other generated stubs. A gate proves that a doc rewrite changed only comments.
-- **Modules:** 38 integrations and conventions you can switch on and off (ponytail, caveman, Conventional Commits, Conventional Comments, ADRs, Keep a Changelog, Vale, cspell, Cursor/Windsurf/Cline/Kiro/AGENTS.md exports, …).
+- **Modules:** 39 integrations and conventions you can switch on and off (ponytail, caveman, Conventional Commits, Conventional Comments, ADRs, Keep a Changelog, Vale, cspell, Cursor/Windsurf/Cline/Kiro/AGENTS.md exports, …).
 - **Small context cost:** hooks inject a short core plus one index line per active module. The agent reads a module only when the work matches it.
 
 **Full documentation: [docs/](docs/README.md).** It has a tutorial, how-to guides (team setup, glossary, locales, code docs, modules, tuning), the complete configuration reference and the writing standards.
@@ -65,6 +66,7 @@ Restart Claude Code after you install.
 /ocre-jelly rewrite docs/guide.md    minimal repairs, facts preserved
 /ocre-jelly docs src/api/*.ts        audit or fix comments and doc comments
 /ocre-jelly modules list             see which modules are on, and why
+/ocre-jelly commit                   check the commit message you're about to use
 /ocre-jelly config show              see the merged settings
 ```
 
@@ -91,7 +93,8 @@ One JSON shape, four layers. Later layers win:
   "thresholds": { "sentence_words": 25, "instruction_words": 20, "em_dash_per_paragraph": 3, "length_hits_per_file": 3 },
   "severity": { "em-dash": "off", "anglicism": "hard" },
   "ignore_paths": ["**/*.generated.cs", "vendor/*"],
-  "protected_terms": ["MoFlex", "CMiC"]
+  "protected_terms": ["MoFlex", "CMiC"],
+  "commits": { "enforce": "block", "convention": "conventional", "subject_max": 72 }
 }
 ```
 
@@ -117,12 +120,13 @@ skills/ocre-jelly/
   SKILL.md             the skill: audit, rewrite, docs, modules, config
   core-rules.md        the always-on rules injected by the hooks
   references/          STE100, French rules, patterns, code-doc conventions, glossary template
-  modules/             38 switchable integrations and conventions
+  modules/             39 switchable integrations and conventions
   locales/             en, fr and 8 regional variants
-  scripts/             scan.py (prose), codedoc.py (comments and strings), modules.py (modules, config, hooks), config.py, gen_docs.py
+  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), modules.py (modules, config, hooks), config.py, gen_docs.py
 docs/                  user documentation (Diátaxis: tutorials, how-to, reference, explanation)
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall
+.pre-commit-hooks.yaml the commit-msg hook for the pre-commit framework
 ```
 
 ## License

@@ -19,6 +19,7 @@ Repair concrete AI-writing defects. Leave everything else alone. A no-op beats a
 - `rewrite` (default when no mode word is given): diagnose, then make the smallest repairs.
 - `docs [audit] <files>`: the same two passes, on the comments and doc comments of source files. See [Code docs](#code-docs).
 - `modules ...`: list, enable, disable or export modules. See [Modules](#modules).
+- `commit [message or file]`: check a commit message's shape and prose with `scripts/commitmsg.py`. See [Commits and PRs](#commits-and-prs).
 - `config ...`: show or change settings (`show`, `path`, `init`, `set`). Ask whether a change is for the team (`--project`, committed), for this clone only (`--local`) or for every repo (the default user layer).
 
 Input is inline text or a file path the user gives. Only read files the user named. Never go looking for writing samples elsewhere on disk.
@@ -92,6 +93,13 @@ For `docs` mode, and whenever the user asks to review or fix comments or doc com
    python3 <this-skill-dir>/scripts/codedoc.py --same-code original.ext rewritten.ext
    ```
    Keep a copy of each original in a scratch directory for this check. Any answer except `code unchanged` blocks: undo the edit.
+
+## Commits and PRs
+
+- Before you run `git commit`, write the message to a scratch file and check it with `python3 <this-skill-dir>/scripts/commitmsg.py <file>`. Fix the hard findings, and weigh the soft ones. The convention (Conventional Commits, gitmoji or none), the limits and the enforcement come from the `commits` config.
+- When the repo runs the hook with `commits.enforce: block`, a commit with a hard finding fails. Read the hook's output, fix the message, and commit again. Never bypass it with `--no-verify` unless the user asks.
+- To install the hook: `modules.py export git-hook` writes `.git/hooks/commit-msg`. With husky, lefthook or the pre-commit framework, follow `docs/how-to/check-commit-messages.md` in the ocre-jelly repo instead.
+- PR and MR descriptions: fill the repo's template (the `pr-template` module), then scan the body with `scan.py` like any prose. To audit an existing PR, fetch the body with the repo's CLI (`gh pr view --json body -q .body`, `glab mr view`), then scan it.
 
 ## Modules
 

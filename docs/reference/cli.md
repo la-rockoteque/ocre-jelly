@@ -55,6 +55,24 @@ python3 $OJ/codedoc.py --same-code original.ts rewritten.ts
 
 Output: `<file>:L<line> <severity> <category> '<match>'` for several files, `L<line> …` for one.
 
+## commitmsg.py: commit messages
+
+```bash
+python3 $OJ/commitmsg.py .git/COMMIT_EDITMSG
+git log -1 --format=%B | python3 $OJ/commitmsg.py
+python3 $OJ/commitmsg.py --hook "$1"          # inside a commit-msg hook
+```
+
+| Option | Meaning |
+|---|---|
+| `FILE` | The message file. Default: stdin. |
+| `--hook` | Run as the commit-msg hook: obey `commits.enforce`, and print to stderr so git shows it. |
+| `--enforce off\|warn\|block` | Override `commits.enforce`. Without `--hook` and without this option, the script uses `warn`. |
+| `--convention auto\|conventional\|gitmoji\|none` | Override `commits.convention`. |
+| `--json`, `--no-config`, `--selftest` | As in `scan.py`. |
+
+Exit 1 only with `block` and a hard finding. See [Check commit messages and PR descriptions](../how-to/check-commit-messages.md).
+
 ## modules.py: modules, config and hooks
 
 | Command | Does |

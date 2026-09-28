@@ -9,6 +9,10 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 - Brand icon in `assets/`, shown in the README and referenced by the plugin manifest.
 - User documentation in `docs/`: a getting-started tutorial, nine how-to guides, the configuration, command-line and glossary-format reference, and explanations of the writing standards and the design.
 - `gen_docs.py` generates the modules, locales and checks reference pages from the code. `setup.sh --check` fails when they are stale.
+- `commitmsg.py` checks commit messages: subject length and period, the blank line, body wrap, the imperative, Conventional Commits or gitmoji, and the prose of the body.
+- `commits` config section: `enforce` (off, warn, block), `convention`, `subject_max`, `subject_target`, `body_wrap`, `types`.
+- `git-hook` export module (`.git/hooks/commit-msg`) and `.pre-commit-hooks.yaml` for the pre-commit framework.
+- The `commit` skill mode, and a guide for commit messages and PR descriptions.
 
 ## [0.1.0] - 2026-09-28
 

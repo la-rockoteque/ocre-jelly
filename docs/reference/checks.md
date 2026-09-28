@@ -6,36 +6,44 @@ Every finding has a category and a severity. **hard** means almost always a defe
 
 | Category | Severity | Languages | Scanner | What it flags | Examples |
 |---|---|---|---|---|---|
-| `throat-clearing` | hard | en, fr | scan.py, codedoc.py | Openers that delay the point | "Here's the thing:", "Let's dive in", « Il est important de noter que » |
-| `emphasis-crutch` | hard | en, fr | scan.py, codedoc.py | Phrases that manufacture importance | "Let that sink in", "Full stop.", « Point final. » |
-| `chatbot-artifact` | hard | en, fr | scan.py, codedoc.py | Chat-assistant leftovers | "I hope this helps", "Great question", « N'hésitez pas à » |
-| `cutoff-disclaimer` | hard | en, fr | scan.py, codedoc.py | Model self-reference | "As of my last update", "As an AI language model, I" |
-| `reasoning-artifact` | hard | en | scan.py, codedoc.py | Visible chain-of-thought scaffolding | "Let me think step by step" |
-| `significance-inflation` | hard | en, fr | scan.py, codedoc.py | Inflated importance | "stands as a testament", "pivotal moment", « change la donne » |
-| `generic-conclusion` | hard | en, fr | scan.py, codedoc.py | Empty closing lines | "The future looks bright", « Seul l'avenir nous le dira » |
-| `ai-vocabulary` | hard | en, fr | scan.py, codedoc.py | Words models overuse | "delve", "tapestry", "multifaceted", « tapisserie » |
-| `binary-contrast` | soft | en, fr | scan.py, codedoc.py | "It's not X, it's Y" drama | "It's not just a tool. It's a revolution.", « Ce n'est pas X, c'est Y » |
-| `ing-tail` | soft | en, fr | scan.py, codedoc.py | Trailing participle that adds nothing | ", highlighting…", ", showcasing…", « , soulignant… » |
-| `vague-attribution` | soft | en, fr | scan.py, codedoc.py | Claims with no source | "Experts argue", "Studies show", « De nombreuses études » |
-| `copula-avoidance` | soft | en, fr | scan.py, codedoc.py | "serves as" instead of "is" | "serves as a", « joue un rôle clé » |
-| `promotional` | soft | en, fr | scan.py, codedoc.py | Marketing adjectives | "world-class", "seamless", « de pointe », « incontournable » |
-| `filler-adverb` | soft | en, fr | scan.py, codedoc.py | Sentence-initial filler | "Importantly,", "Crucially,", « Notamment, » |
-| `reader-steering` | soft | en, fr | scan.py, codedoc.py | Telling the reader what to think | "Here's why", "Why this matters", « Voici pourquoi » |
-| `colon-reveal` | soft | en, fr | scan.py, codedoc.py | Drumroll colons | "The key is:", « La clé est : » |
-| `false-range` | soft | en | scan.py, codedoc.py | "from X to Y, from A to B" ranges | "spanning everything from" |
-| `list-inflation` | soft | en, fr | scan.py, codedoc.py | Listicle framing | "Here are 5 reasons", « Voici 5 astuces » |
-| `fragmentation` | soft | en | scan.py, codedoc.py | Dramatic fragments | ". That's it." |
-| `recap-coda` | soft | fr | scan.py, codedoc.py | Closing recap paragraph | « En résumé, », « Pour conclure, » |
-| `ste-wordy` | soft | en, fr | scan.py, codedoc.py | Wordy phrasing STE replaces with one word | "in order to", "utilize", « afin de », « procéder à » |
-| `ste-length` | soft | all | scan.py, codedoc.py | Sentence longer than `thresholds.sentence_words` | any sentence over 25 words |
-| `em-dash` | soft | all | scan.py, codedoc.py | Em-dash habit (`thresholds.em_dash_per_paragraph` or more in one paragraph) | three — in one paragraph |
-| `glossary-alias` | soft | all | scan.py, codedoc.py | An alias to avoid from the ubiquitous-language glossary | "basket" when the Term is Order |
-| `locale-spelling` | soft | en | scan.py, codedoc.py | Spelling from another variety of English | "colour" in en-US, "color" in en-GB |
-| `locale-term` | soft | en, fr | scan.py, codedoc.py | A term the locale replaces | "e-mail" in fr-CA (courriel), "hashtag" in fr-FR (mot-dièse) |
-| `anglicism` | soft | fr | scan.py, codedoc.py | Anglicism the OQLF advises against (fr-CA) | « céduler », « faire du sens », « à l'effet que » |
-| `typography` | soft | fr | scan.py, codedoc.py | Missing no-break space before ; : ! ? (fr-FR, fr-BE) | « Attention: » |
+| `throat-clearing` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Openers that delay the point | "Here's the thing:", "Let's dive in", « Il est important de noter que » |
+| `emphasis-crutch` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Phrases that manufacture importance | "Let that sink in", "Full stop.", « Point final. » |
+| `chatbot-artifact` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Chat-assistant leftovers | "I hope this helps", "Great question", « N'hésitez pas à » |
+| `cutoff-disclaimer` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Model self-reference | "As of my last update", "As an AI language model, I" |
+| `reasoning-artifact` | hard | en | scan.py, codedoc.py, commitmsg.py | Visible chain-of-thought scaffolding | "Let me think step by step" |
+| `significance-inflation` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Inflated importance | "stands as a testament", "pivotal moment", « change la donne » |
+| `generic-conclusion` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Empty closing lines | "The future looks bright", « Seul l'avenir nous le dira » |
+| `ai-vocabulary` | hard | en, fr | scan.py, codedoc.py, commitmsg.py | Words models overuse | "delve", "tapestry", "multifaceted", « tapisserie » |
+| `binary-contrast` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | "It's not X, it's Y" drama | "It's not just a tool. It's a revolution.", « Ce n'est pas X, c'est Y » |
+| `ing-tail` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Trailing participle that adds nothing | ", highlighting…", ", showcasing…", « , soulignant… » |
+| `vague-attribution` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Claims with no source | "Experts argue", "Studies show", « De nombreuses études » |
+| `copula-avoidance` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | "serves as" instead of "is" | "serves as a", « joue un rôle clé » |
+| `promotional` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Marketing adjectives | "world-class", "seamless", « de pointe », « incontournable » |
+| `filler-adverb` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Sentence-initial filler | "Importantly,", "Crucially,", « Notamment, » |
+| `reader-steering` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Telling the reader what to think | "Here's why", "Why this matters", « Voici pourquoi » |
+| `colon-reveal` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Drumroll colons | "The key is:", « La clé est : » |
+| `false-range` | soft | en | scan.py, codedoc.py, commitmsg.py | "from X to Y, from A to B" ranges | "spanning everything from" |
+| `list-inflation` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Listicle framing | "Here are 5 reasons", « Voici 5 astuces » |
+| `fragmentation` | soft | en | scan.py, codedoc.py, commitmsg.py | Dramatic fragments | ". That's it." |
+| `recap-coda` | soft | fr | scan.py, codedoc.py, commitmsg.py | Closing recap paragraph | « En résumé, », « Pour conclure, » |
+| `ste-wordy` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | Wordy phrasing STE replaces with one word | "in order to", "utilize", « afin de », « procéder à » |
+| `ste-length` | soft | all | scan.py, codedoc.py, commitmsg.py | Sentence longer than `thresholds.sentence_words` | any sentence over 25 words |
+| `em-dash` | soft | all | scan.py, codedoc.py, commitmsg.py | Em-dash habit (`thresholds.em_dash_per_paragraph` or more in one paragraph) | three — in one paragraph |
+| `glossary-alias` | soft | all | scan.py, codedoc.py, commitmsg.py | An alias to avoid from the ubiquitous-language glossary | "basket" when the Term is Order |
+| `locale-spelling` | soft | en | scan.py, codedoc.py, commitmsg.py | Spelling from another variety of English | "colour" in en-US, "color" in en-GB |
+| `locale-term` | soft | en, fr | scan.py, codedoc.py, commitmsg.py | A term the locale replaces | "e-mail" in fr-CA (courriel), "hashtag" in fr-FR (mot-dièse) |
+| `anglicism` | soft | fr | scan.py, codedoc.py, commitmsg.py | Anglicism the OQLF advises against (fr-CA) | « céduler », « faire du sens », « à l'effet que » |
+| `typography` | soft | fr | scan.py, codedoc.py, commitmsg.py | Missing no-break space before ; : ! ? (fr-FR, fr-BE) | « Attention: » |
 | `echo-doc` | hard | all | codedoc.py | Doc summary that only restates the declaration | "Gets the user name." on GetUserName |
 | `param-echo` | hard | all | codedoc.py | Parameter description that only restates the name | "@param id The id." |
 | `returns-echo` | hard | all | codedoc.py | Return description with no content | "@returns The result." |
 | `generated-doc` | hard | all | codedoc.py | Doc-generator placeholders | `<autogeneratedoc />`, `_summary_`, `@param {*} x` |
 | `this-method` | soft | all | codedoc.py | "This method is used to…" openers | "A helper function that…" |
+| `commit-empty` | hard | all | commitmsg.py | Empty commit message | only comment lines |
+| `commit-subject-length` | hard/soft | all | commitmsg.py | Subject over `commits.subject_max` (hard) or `commits.subject_target` (soft) | a 90-character subject |
+| `commit-subject-period` | soft | all | commitmsg.py | Subject ends with a period | "fix: add retry." |
+| `commit-blank-line` | hard | all | commitmsg.py | No blank line between the subject and the body | body text on line 2 |
+| `commit-body-wrap` | soft | all | commitmsg.py | Body line over `commits.body_wrap` (URLs, code and trailers exempt) | a 110-character body line |
+| `commit-format` | hard | all | commitmsg.py | Subject doesn't follow `commits.convention` | "Add retry" in a Conventional Commits repo |
+| `commit-type` | hard | all | commitmsg.py | Conventional Commits type not in `commits.types` | "feature: add retry" |
+| `commit-imperative` | soft | all | commitmsg.py | Subject not in the imperative | "Added retry", "fix: fixes retry" |

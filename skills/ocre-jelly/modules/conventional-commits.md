@@ -12,3 +12,4 @@ description: Conventional Commits (with Angular types, commitlint and the 50/72 
 - Breaking changes: add `!` after the type or scope, and a `BREAKING CHANGE: <what breaks and how to migrate>` footer.
 - Footers go last, one per line, as `Token: value` (`Refs: #42`, `Co-authored-by: …`). Never put footers in the body.
 - The body follows the prose rules (STE100, no slop). The subject follows this convention, not STE sentence rules.
+- Before you commit, check the message: `commitmsg.py <file>` (or stdin). The repo may run it as a commit-msg hook; with `commits.enforce: block`, fix every hard finding.

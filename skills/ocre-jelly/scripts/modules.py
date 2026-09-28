@@ -16,6 +16,7 @@ A module is ../modules/<name>.md: simple `key: value` frontmatter plus a body.
   inject:  always            rules only: inline the whole body every session, not an index line
   target:  path              export only, relative to the project root
   write:   file | block      export only: own the whole file, or upsert a marked block
+  mode:    executable        export only: chmod 755 after writing (git hooks)
   needs:   glossary          export only: requires the project's ubiquitous language
 
 State lives in the layered JSON config (see config.py): ~/.claude/ocre-jelly.json,
@@ -255,6 +256,8 @@ def export_one(m: dict, root: Path, ctx: dict, dry_run: bool, force: bool) -> st
     if not dry_run:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(new, encoding="utf-8")
+        if m.get("mode") == "executable":
+            path.chmod(0o755)
     return f"{'would write' if dry_run else 'wrote'} {m['name']}: {path.relative_to(root)}"
 
 
@@ -274,12 +277,15 @@ def run_export(names: list[str], glossary: str | None, dry_run: bool, force: boo
     gpath = Path(glossary) if glossary else config.find_glossary(root, cfg)
     md = gpath.read_text(encoding="utf-8") if gpath else ""
     ctx = {"rules": rules_text(mods, active, full=True, locales=cfg["locales"]), "rows": scan.glossary_rows(md),
-           "aliases": scan.load_glossary(md), "mark": MARK}
+           "aliases": scan.load_glossary(md), "mark": MARK, "scripts_dir": str(HERE), "root": str(root)}
     for n in chosen:
         if exports[n].get("needs") == "glossary" and not ctx["rows"]:
             print(f"skip  {n}: needs a ubiquitous-language glossary (none found; pass --glossary)")
             continue
-        print(export_one(exports[n], root, ctx, dry_run, force))
+        try:
+            print(export_one(exports[n], root, ctx, dry_run, force))
+        except ValueError as e:
+            print(f"skip  {n}: {e}")
 
 
 # ---- cli -------------------------------------------------------------------
@@ -403,6 +409,10 @@ def selftest() -> None:
         once = upsert_block("# Agents\n\nmine\n", "OJ v1")
         twice = upsert_block(once, "OJ v2")
         assert "mine" in twice and "OJ v2" in twice and "OJ v1" not in twice and twice.count(BLOCK_START) == 1
+
+        h = {"name": "hook", "kind": "export", "target": ".git/hooks/commit-msg", "mode": "executable", "body": "#!/bin/sh\n# " + MARK}
+        assert export_one(h, root, ctx, False, False).startswith("wrote")
+        assert (root / ".git/hooks/commit-msg").stat().st_mode & 0o111, "hook not executable"
 
         (root / "docs").mkdir()
         (root / "docs" / "Ubiquitous-Language.md").write_text("x")

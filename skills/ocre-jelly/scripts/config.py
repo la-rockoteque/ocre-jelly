@@ -44,10 +44,19 @@ DEFAULTS = {
     "severity": {},                # category -> hard | soft | off, e.g. {"em-dash": "off"}
     "ignore_paths": [],            # globs from the repo root that docs mode and codedoc skip
     "protected_terms": [],         # extra words never flagged or respelled (brand names, code names)
+    "commits": {                   # commitmsg.py and the commit-msg hook
+        "enforce": "warn",          # off | warn (print, never block) | block (exit 1 on hard findings)
+        "convention": "auto",       # auto (from the modules) | conventional | gitmoji | none
+        "subject_max": 72,
+        "subject_target": 50,
+        "body_wrap": 72,
+        "types": [],                # allowed Conventional Commits types; empty = the standard list
+    },
 }
 
 TYPES = {"enabled": bool, "locales": list, "glossary": (str, type(None)), "modules": dict, "inject": str,
-         "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list}
+         "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list,
+         "commits": dict}
 
 
 def claude_dir() -> Path:
@@ -86,7 +95,7 @@ def validate(data: dict, where: str) -> list[str]:
     for key, value in (data.get("thresholds") or {}).items():
         if key not in DEFAULTS["thresholds"] or not isinstance(value, int) or value < 1:
             errors.append(f"{where}: thresholds.{key} must be a known key with a positive integer")
-    for tag in data.get("locales") or []:
+    for tag in data.get("locales") if isinstance(data.get("locales"), list) else []:
         if not isinstance(tag, str) or not TAG_RE.match(tag):
             errors.append(f"{where}: locales entry {tag!r} must look like en, en-CA or fr-FR")
     sub = data.get("subagents") or {}
@@ -100,6 +109,20 @@ def validate(data: dict, where: str) -> list[str]:
     for key in ("ignore_paths", "protected_terms"):
         if any(not isinstance(x, str) for x in data.get(key) or []):
             errors.append(f"{where}: {key} must be a list of strings")
+    commits = data.get("commits") or {}
+    choices = {"enforce": ("off", "warn", "block"), "convention": ("auto", "conventional", "gitmoji", "none")}
+    for key, value in commits.items():
+        if key in choices:
+            if value not in choices[key]:
+                errors.append(f"{where}: commits.{key} must be one of {choices[key]}")
+        elif key in ("subject_max", "subject_target", "body_wrap"):
+            if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                errors.append(f"{where}: commits.{key} must be a positive integer")
+        elif key == "types":
+            if not isinstance(value, list) or any(not isinstance(t, str) for t in value):
+                errors.append(f"{where}: commits.types must be a list of strings")
+        else:
+            errors.append(f"{where}: unknown key commits.{key}")
     if data.get("inject") not in (None, "index", "full"):
         errors.append(f"{where}: inject must be index or full")
     return errors
@@ -240,6 +263,8 @@ def selftest() -> None:
         (root / ".claude" / "ocre-jelly.json").write_text('{"locales": "en-CA"}')
         assert load(root)["locales"] == ["en-US"], "invalid layer must be ignored, not half-applied"
 
+        assert validate({"commits": {"enforce": "maybe"}}, "t") and not validate({"commits": {"enforce": "block", "types": ["feat"]}}, "t")
+        assert load(root)["commits"]["enforce"] == "warn"
         assert validate({"locales": ["../../etc/passwd"]}, "t") and validate({"subagents": {"inject": "yes", "x": 1}}, "t")
         (tmp / "secret.md").write_text("s")
         assert find_glossary(root, {"glossary": "../secret.md"}) is None, "glossary escaped the repo"

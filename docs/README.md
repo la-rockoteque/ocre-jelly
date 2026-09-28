@@ -18,6 +18,7 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 | Give the project one vocabulary | [Write a ubiquitous-language glossary](how-to/write-a-glossary.md) |
 | Check spelling and terms for en-CA, fr-CA, fr-FR and others | [Configure locales](how-to/configure-locales.md) |
 | Fix comments, doc comments and i18n strings | [Audit code docs and UI strings](how-to/audit-code-docs-and-ui-strings.md) |
+| Check commit messages (warn or block) and PR descriptions | [Check commit messages and PR descriptions](how-to/check-commit-messages.md) |
 | Turn integrations on or off, export rules to other tools | [Manage modules and exports](how-to/manage-modules-and-exports.md) |
 | Reduce noise, raise or drop a check, skip paths | [Tune the checks](how-to/tune-checks.md) |
 | Add support for a tool or convention | [Add a module](how-to/add-a-module.md) |
@@ -27,9 +28,9 @@ These docs follow [Diátaxis](https://diataxis.fr/): a tutorial to learn, how-to
 ## Reference
 
 - [Configuration](reference/configuration.md): every key, its type and default, the layers, and the environment variables.
-- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
+- [Command line](reference/cli.md): `scan.py`, `codedoc.py`, `commitmsg.py`, `modules.py`, `gen_docs.py` and `setup.sh`.
 - [Checks](reference/checks.md): every finding category, its severity and its languages. *Generated.*
-- [Modules](reference/modules.md): all 38 modules, their defaults and triggers. *Generated.*
+- [Modules](reference/modules.md): all 39 modules, their defaults and triggers. *Generated.*
 - [Locales](reference/locales.md): the 10 locales and what each one checks. *Generated.*
 - [Glossary format](reference/glossary-format.md): the table shape the parser reads.
 

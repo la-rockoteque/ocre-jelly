@@ -1,6 +1,6 @@
 # Configuration
 
-ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`) merge key by key; every other value replaces the one before it.
+ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`) merge key by key; every other value replaces the one before it.
 
 | # | Layer | File | Commit it? | Written by |
 |---|---|---|---|---|
@@ -30,6 +30,12 @@ The repo is the nearest parent folder that contains `.git`. The JSON Schema is `
 | `severity` | object | `{}` | Category to `hard`, `soft` or `off`. See [Checks](checks.md). |
 | `ignore_paths` | list of globs | `[]` | Paths from the repo root that `codedoc.py` skips. `*` also crosses `/`. |
 | `protected_terms` | list of strings | `[]` | Words never flagged as aliases and never respelled. Glossary Terms are protected already. |
+| `commits.enforce` | `"off"`, `"warn"`, `"block"` | `"warn"` | The commit-msg hook: print nothing, print and never block, or print and reject the commit on a hard finding. See [Check commit messages](../how-to/check-commit-messages.md). |
+| `commits.convention` | `"auto"`, `"conventional"`, `"gitmoji"`, `"none"` | `"auto"` | The subject rule. `auto` follows the `conventional-commits` and `gitmoji` modules. |
+| `commits.subject_max` | integer ≥ 1 | `72` | Over this, the subject is a hard finding. |
+| `commits.subject_target` | integer ≥ 1 | `50` | Over this, the subject is a soft finding. |
+| `commits.body_wrap` | integer ≥ 1 | `72` | Body lines over this are soft findings. URLs, code and trailers are exempt. |
+| `commits.types` | list of strings | `[]` | Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert. |
 
 ## Environment variables
 
@@ -57,7 +63,8 @@ A bilingual team repo, `.claude/ocre-jelly.json`:
   "glossary": "docs/ubiquitous-language.md",
   "modules": { "conventional-commits": "on", "ghostdoc": "on" },
   "ignore_paths": ["**/*.generated.cs", "moship-web/src/api/generated/*"],
-  "protected_terms": ["MoFlex", "CMiC", "Brix"]
+  "protected_terms": ["MoFlex", "CMiC", "Brix"],
+  "commits": { "enforce": "block", "convention": "conventional" }
 }
 ```
 
@@ -66,7 +73,8 @@ A personal override, `.claude/ocre-jelly.local.json`:
 ```json
 {
   "severity": { "em-dash": "off" },
-  "subagents": { "matcher": "writer|doc" }
+  "subagents": { "matcher": "writer|doc" },
+  "commits": { "enforce": "warn" }
 }
 ```
 

@@ -26,11 +26,11 @@ done
 
 selftests() {
   command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
-  for t in config scan codedoc modules; do
-    printf '%-8s ' "$t"
+  for t in config scan codedoc commitmsg modules; do
+    printf '%-10s ' "$t"
     python3 "$SRC/skills/ocre-jelly/scripts/$t.py" --selftest 2>/dev/null || { echo "FAILED: $t" >&2; exit 1; }
   done
-  printf '%-8s ' docs
+  printf '%-10s ' docs
   python3 "$SRC/skills/ocre-jelly/scripts/gen_docs.py" --check || exit 1
 }
 

@@ -1,0 +1,14 @@
+# For teams on the pre-commit framework (https://pre-commit.com). In the target repo's
+# .pre-commit-config.yaml:
+#   - repo: https://git.nexapptech.com/vbernier/ocre-jelly.git
+#     rev: v0.1.0
+#     hooks:
+#       - id: ocre-jelly-commit-msg
+# then: pre-commit install --hook-type commit-msg
+- id: ocre-jelly-commit-msg
+  name: ocre-jelly commit message
+  description: Checks the commit message shape and prose. commits.enforce in .claude/ocre-jelly.json decides warn or block.
+  entry: skills/ocre-jelly/scripts/commitmsg.py --hook
+  language: script
+  stages: [commit-msg]
+  always_run: true

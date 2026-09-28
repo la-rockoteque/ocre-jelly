@@ -5,7 +5,7 @@ A module adds rules for one tool or convention. There are two kinds:
 - **rules** modules add their rules to the session. Examples: ponytail, caveman, Conventional Commits, TSDoc, ADRs.
 - **export** modules write a file for another tool. Examples: AGENTS.md, Cursor, Vale, cspell.
 
-The generated [Modules](../reference/modules.md) page lists all 38.
+The generated [Modules](../reference/modules.md) page lists all 39.
 
 ## See the state
 
@@ -56,6 +56,7 @@ python3 $OJ/modules.py export agents-md cursor vale     # named ones, enabled or
 | `kiro` | `.kiro/steering/ocre-jelly.md` | Kiro |
 | `vale` | `.vale/styles/OcreJelly/UbiquitousLanguage.yml` | Vale (add `OcreJelly` to `BasedOnStyles`) |
 | `cspell` | `.cspell/ubiquitous-language.txt` | cspell (add it to `dictionaryDefinitions`) |
+| `git-hook` | `.git/hooks/commit-msg` (executable, never committed) | git: checks each commit message. See [Check commit messages](check-commit-messages.md). |
 
 Safety rules:
 
