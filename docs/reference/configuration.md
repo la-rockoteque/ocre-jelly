@@ -1,6 +1,6 @@
 # Configuration
 
-ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`) merge key by key; every other value replaces the one before it.
+ocre-jelly reads one JSON shape from four layers. Later layers win. Objects (`modules`, `thresholds`, `severity`, `subagents`, `commits`, `feedback`) merge key by key; every other value replaces the one before it.
 
 | # | Layer | File | Commit it? | Written by |
 |---|---|---|---|---|
@@ -35,6 +35,9 @@ The repo is the nearest parent folder that contains `.git`. The JSON Schema is `
 | `commits.subject_max` | integer ≥ 1 | `72` | Over this, the subject is a hard finding. |
 | `commits.subject_target` | integer ≥ 1 | `50` | Over this, the subject is a soft finding. |
 | `commits.body_wrap` | integer ≥ 1 | `72` | Body lines over this are soft findings. URLs, code and trailers are exempt. |
+| `feedback.enabled` | boolean | `true` | `false` makes `/ocre-jelly feedback` refuse, and stops Claude from offering it. |
+| `feedback.form_url` | https URL | the ocre-jelly form | The form's `viewform` URL. Point it at your team's own form if you like. |
+| `feedback.entry` | digits, as a string | `"1018508464"` | The id of the form's paragraph field, from a pre-filled link (`entry.<id>=`). |
 | `commits.types` | list of strings | `[]` | Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert. |
 
 ## Environment variables

@@ -13,6 +13,7 @@ All notable changes to ocre-jelly are listed here. The format follows [Keep a Ch
 - `commits` config section: `enforce` (off, warn, block), `convention`, `subject_max`, `subject_target`, `body_wrap`, `types`.
 - `git-hook` export module (`.git/hooks/commit-msg`) and `.pre-commit-hooks.yaml` for the pre-commit framework.
 - The `commit` skill mode, and a guide for commit messages and PR descriptions.
+- Feedback: `/ocre-jelly feedback` and `feedback.py` pre-fill [the feedback form](https://forms.gle/GwKgxKB23iSKyZqr7) after the user confirms the text; the user submits it. Claude offers it when a request isn't supported. The `feedback` config section can point at another form or turn it off.
 
 ## [0.1.0] - 2026-09-28
 

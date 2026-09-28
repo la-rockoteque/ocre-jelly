@@ -73,6 +73,25 @@ python3 $OJ/commitmsg.py --hook "$1"          # inside a commit-msg hook
 
 Exit 1 only with `block` and a hard finding. See [Check commit messages and PR descriptions](../how-to/check-commit-messages.md).
 
+## feedback.py: feedback to the author
+
+```bash
+python3 $OJ/feedback.py --kind feature --message "Support es-MX" --why "Half our docs are Spanish" --open
+echo "The glossary parser misses my 5-column tables" | python3 $OJ/feedback.py --kind bug
+```
+
+| Option | Meaning |
+|---|---|
+| `--kind feature\|bug\|feedback` | The first word of the text. Default: `feedback`. |
+| `--message TEXT` | The request or comment. Default: stdin. |
+| `--why TEXT` | The use case. |
+| `--contact TEXT` | Optional: how the author can reach you. |
+| `--no-context` | Leave out the line with the ocre-jelly version, the configured locales and the Python version. |
+| `--open` | Open the pre-filled form in the browser. Without it, the script only prints the text and the link. |
+| `--selftest` | Run the self-test. |
+
+The script never sends anything; the browser talks to the form when you click Submit. Text too long for a link opens the empty form, and prints the text to paste.
+
 ## modules.py: modules, config and hooks
 
 | Command | Does |

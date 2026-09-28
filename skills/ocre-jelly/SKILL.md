@@ -20,6 +20,7 @@ Repair concrete AI-writing defects. Leave everything else alone. A no-op beats a
 - `docs [audit] <files>`: the same two passes, on the comments and doc comments of source files. See [Code docs](#code-docs).
 - `modules ...`: list, enable, disable or export modules. See [Modules](#modules).
 - `commit [message or file]`: check a commit message's shape and prose with `scripts/commitmsg.py`. See [Commits and PRs](#commits-and-prs).
+- `feedback [text]`: send a feature request, a bug or a comment to the ocre-jelly author. See [Feedback](#feedback).
 - `config ...`: show or change settings (`show`, `path`, `init`, `set`). Ask whether a change is for the team (`--project`, committed), for this clone only (`--local`) or for every repo (the default user layer).
 
 Input is inline text or a file path the user gives. Only read files the user named. Never go looking for writing samples elsewhere on disk.
@@ -100,6 +101,20 @@ For `docs` mode, and whenever the user asks to review or fix comments or doc com
 - When the repo runs the hook with `commits.enforce: block`, a commit with a hard finding fails. Read the hook's output, fix the message, and commit again. Never bypass it with `--no-verify` unless the user asks.
 - To install the hook: `modules.py export git-hook` writes `.git/hooks/commit-msg`. With husky, lefthook or the pre-commit framework, follow `docs/how-to/check-commit-messages.md` in the ocre-jelly repo instead.
 - PR and MR descriptions: fill the repo's template (the `pr-template` module), then scan the body with `scan.py` like any prose. To audit an existing PR, fetch the body with the repo's CLI (`gh pr view --json body -q .body`, `glab mr view`), then scan it.
+
+## Feedback
+
+When the user asks for something ocre-jelly doesn't do (a language, a locale, a convention, a doc format, a tool integration, a check), say so plainly first. Name the closest thing that exists, if any. Then offer, with AskUserQuestion, to send a feature request to the author. For `/ocre-jelly feedback`, skip the offer.
+
+1. Draft the text: one line for the request, one for why the user needs it, and any detail they gave. Use the ocre-jelly writing rules.
+2. Leave out code, file contents, file paths, repo, product and customer names, people's names and anything secret, unless the user explicitly adds them.
+3. Show the exact text, and ask the user to confirm or edit it. Ask whether to add a contact (an email or a name) and whether to include the context line (version, locales, Python version).
+4. After they confirm, run:
+   ```bash
+   python3 <this-skill-dir>/scripts/feedback.py --kind feature|bug|feedback --message "<text>" [--why "<use case>"] [--contact "<contact>"] [--no-context] --open
+   ```
+   Pass the text as an argument or on stdin, never interpolated unquoted into the shell. The script opens the form in the browser, pre-filled. Tell the user that nothing is sent until they click **Submit** there.
+5. Never submit the form yourself, and never send feedback without the user's confirmation. If `feedback.enabled` is false in the config, say that feedback is turned off in this repo.
 
 ## Modules
 

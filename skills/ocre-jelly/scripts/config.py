@@ -52,11 +52,16 @@ DEFAULTS = {
         "body_wrap": 72,
         "types": [],                # allowed Conventional Commits types; empty = the standard list
     },
+    "feedback": {                  # feedback.py: pre-fills a form; the user submits it in the browser
+        "enabled": True,
+        "form_url": "https://docs.google.com/forms/d/e/1FAIpQLSdnhduOn5MnbEBo6Dp44mNfiXvTkNj2PKmJE-5opP9_MwlYDg/viewform",
+        "entry": "1018508464",      # the form's paragraph field (entry.<id>)
+    },
 }
 
 TYPES = {"enabled": bool, "locales": list, "glossary": (str, type(None)), "modules": dict, "inject": str,
          "subagents": dict, "thresholds": dict, "severity": dict, "ignore_paths": list, "protected_terms": list,
-         "commits": dict}
+         "commits": dict, "feedback": dict}
 
 
 def claude_dir() -> Path:
@@ -123,6 +128,15 @@ def validate(data: dict, where: str) -> list[str]:
                 errors.append(f"{where}: commits.types must be a list of strings")
         else:
             errors.append(f"{where}: unknown key commits.{key}")
+    for key, value in (data.get("feedback") or {}).items():
+        if key == "enabled" and not isinstance(value, bool):
+            errors.append(f"{where}: feedback.enabled must be true or false")
+        elif key == "form_url" and not (isinstance(value, str) and value.startswith("https://")):
+            errors.append(f"{where}: feedback.form_url must be an https URL")
+        elif key == "entry" and not (isinstance(value, str) and value.isdigit()):
+            errors.append(f"{where}: feedback.entry must be the numeric field id, as a string")
+        elif key not in ("enabled", "form_url", "entry"):
+            errors.append(f"{where}: unknown key feedback.{key}")
     if data.get("inject") not in (None, "index", "full"):
         errors.append(f"{where}: inject must be index or full")
     return errors
@@ -265,6 +279,8 @@ def selftest() -> None:
 
         assert validate({"commits": {"enforce": "maybe"}}, "t") and not validate({"commits": {"enforce": "block", "types": ["feat"]}}, "t")
         assert load(root)["commits"]["enforce"] == "warn"
+        assert validate({"feedback": {"form_url": "http://evil"}}, "t") and validate({"feedback": {"entry": "x1"}}, "t")
+        assert not validate({"feedback": {"enabled": False, "form_url": "https://f.example/form", "entry": "42"}}, "t")
         assert validate({"locales": ["../../etc/passwd"]}, "t") and validate({"subagents": {"inject": "yes", "x": 1}}, "t")
         (tmp / "secret.md").write_text("s")
         assert find_glossary(root, {"glossary": "../secret.md"}) is None, "glossary escaped the repo"

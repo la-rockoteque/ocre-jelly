@@ -173,6 +173,28 @@
           "description": "Allowed Conventional Commits types. Empty: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert."
         }
       }
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Where /ocre-jelly feedback sends people. The script only pre-fills the form; the user submits it.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "form_url": {
+          "type": "string",
+          "pattern": "^https://",
+          "description": "The form's viewform URL."
+        },
+        "entry": {
+          "type": "string",
+          "pattern": "^[0-9]+$",
+          "default": "1018508464",
+          "description": "The id of the form's paragraph field (entry.<id>)."
+        }
+      }
     }
   }
 }

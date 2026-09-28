@@ -14,6 +14,8 @@ Prose mode for Claude Code. It removes AI writing patterns from the text your ag
 - **Modules:** 39 integrations and conventions you can switch on and off (ponytail, caveman, Conventional Commits, Conventional Comments, ADRs, Keep a Changelog, Vale, cspell, Cursor/Windsurf/Cline/Kiro/AGENTS.md exports, …).
 - **Small context cost:** hooks inject a short core plus one index line per active module. The agent reads a module only when the work matches it.
 
+**Feedback and feature requests: [the feedback form](https://forms.gle/GwKgxKB23iSKyZqr7),** or `/ocre-jelly feedback` from Claude Code.
+
 **Full documentation: [docs/](docs/README.md).** It has a tutorial, how-to guides (team setup, glossary, locales, code docs, modules, tuning), the complete configuration reference and the writing standards.
 
 Security posture: Python standard library only. No network access, no subprocesses, no transcript harvesting, no automatic PRs. The scanners read only stdin, the files you name and the ocre-jelly config files.
@@ -68,6 +70,7 @@ Restart Claude Code after you install.
 /ocre-jelly modules list             see which modules are on, and why
 /ocre-jelly commit                   check the commit message you're about to use
 /ocre-jelly config show              see the merged settings
+/ocre-jelly feedback                 request a feature or report a problem
 ```
 
 With the plugin installed, the prose mode is always on. `OCRE_JELLY=off` disables it for a session, and "stop ocre-jelly" ends it in chat.
@@ -111,6 +114,15 @@ ocre-jelly reads `docs/ubiquitous-language.md` or `UBIQUITOUS-LANGUAGE.md` (or t
 - Run `./setup.sh --check` after any change. Every module and locale is loaded and checked, and the generated reference pages must be current (`skills/ocre-jelly/scripts/gen_docs.py` rewrites them).
 - Step-by-step guides: [Add a module](docs/how-to/add-a-module.md), [Add a locale](docs/how-to/add-a-locale.md).
 
+## Feedback
+
+Missing a language, a convention or a tool? Found a false positive? Tell the author:
+
+- **In Claude Code:** `/ocre-jelly feedback <what you need>`. Claude also offers this when you ask for something ocre-jelly doesn't support. It shows you the exact text first, then opens [the feedback form](https://forms.gle/GwKgxKB23iSKyZqr7) pre-filled. Nothing is sent until you click Submit.
+- **Directly:** [https://forms.gle/GwKgxKB23iSKyZqr7](https://forms.gle/GwKgxKB23iSKyZqr7).
+
+A team can point the command at its own form, or turn it off, with the `feedback` config. See [Send feedback](docs/how-to/send-feedback.md).
+
 ## Layout
 
 ```
@@ -122,7 +134,7 @@ skills/ocre-jelly/
   references/          STE100, French rules, patterns, code-doc conventions, glossary template
   modules/             39 switchable integrations and conventions
   locales/             en, fr and 8 regional variants
-  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), modules.py (modules, config, hooks), config.py, gen_docs.py
+  scripts/             scan.py (prose), codedoc.py (comments and strings), commitmsg.py (commit messages), feedback.py, modules.py (modules, config, hooks), config.py, gen_docs.py
 docs/                  user documentation (Diátaxis: tutorials, how-to, reference, explanation)
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall
