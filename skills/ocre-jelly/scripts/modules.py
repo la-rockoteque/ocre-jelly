@@ -32,8 +32,8 @@ Usage:
   modules.py --selftest
 
 Security posture: stdlib only, no network, no subprocess. Reads the module
-folder, the two state files, the installed-plugins registry and the glossary.
-Writes only the state files and export targets inside the project root, and
+folder, the config layers, the installed-plugins registry and the glossary.
+Writes only the config layers and export targets inside the project root, and
 never overwrites a file that ocre-jelly did not generate unless --force.
 """
 from __future__ import annotations

@@ -30,6 +30,8 @@ selftests() {
     printf '%-8s ' "$t"
     python3 "$SRC/skills/ocre-jelly/scripts/$t.py" --selftest 2>/dev/null || { echo "FAILED: $t" >&2; exit 1; }
   done
+  printf '%-8s ' docs
+  python3 "$SRC/skills/ocre-jelly/scripts/gen_docs.py" --check || exit 1
 }
 
 if [[ $CHECK -eq 1 ]]; then selftests; exit 0; fi

@@ -13,6 +13,8 @@ Prose mode for Claude Code. It removes AI writing patterns from the text your ag
 - **Modules:** 38 integrations and conventions you can switch on and off (ponytail, caveman, Conventional Commits, Conventional Comments, ADRs, Keep a Changelog, Vale, cspell, Cursor/Windsurf/Cline/Kiro/AGENTS.md exports, …).
 - **Small context cost:** hooks inject a short core plus one index line per active module. The agent reads a module only when the work matches it.
 
+**Full documentation: [docs/](docs/README.md).** It has a tutorial, how-to guides (team setup, glossary, locales, code docs, modules, tuning), the complete configuration reference and the writing standards.
+
 Security posture: Python standard library only. No network access, no subprocesses, no transcript harvesting, no automatic PRs. The scanners read only stdin, the files you name and the ocre-jelly config files.
 
 ## Install
@@ -93,7 +95,7 @@ One JSON shape, four layers. Later layers win:
 }
 ```
 
-`ocre-jelly.schema.json` describes every key. Point your editor at it for completion.
+`ocre-jelly.schema.json` describes every key. Point your editor at it for completion. Every key, default and layer is in [docs/reference/configuration.md](docs/reference/configuration.md).
 
 ## Ubiquitous language
 
@@ -103,7 +105,8 @@ ocre-jelly reads `docs/ubiquitous-language.md` or `UBIQUITOUS-LANGUAGE.md` (or t
 
 - **Module:** add `skills/ocre-jelly/modules/<name>.md` with frontmatter (`kind: rules|export`, `default: on|off|auto`, `detect` or `detect_files`, `when:`) and a body. An export module adds `target:`, and can have a `<name>.py` with `render(ctx)`.
 - **Locale:** add `skills/ocre-jelly/locales/<lang>.py` (patterns, `STOPWORDS`, `AUTHORITY`) or `<lang>-<REGION>.py` (`PARENT`, `SUMMARY`, `SPELLING_STYLE`, `PREFER`, extra `SOFT`/`HARD`).
-- Run `./setup.sh --check` after any change. Every module and locale is loaded and checked.
+- Run `./setup.sh --check` after any change. Every module and locale is loaded and checked, and the generated reference pages must be current (`skills/ocre-jelly/scripts/gen_docs.py` rewrites them).
+- Step-by-step guides: [Add a module](docs/how-to/add-a-module.md), [Add a locale](docs/how-to/add-a-locale.md).
 
 ## Layout
 
@@ -116,7 +119,8 @@ skills/ocre-jelly/
   references/          STE100, French rules, patterns, code-doc conventions, glossary template
   modules/             38 switchable integrations and conventions
   locales/             en, fr and 8 regional variants
-  scripts/             scan.py (prose), codedoc.py (comments and strings), modules.py (modules, config, hooks), config.py
+  scripts/             scan.py (prose), codedoc.py (comments and strings), modules.py (modules, config, hooks), config.py, gen_docs.py
+docs/                  user documentation (Diátaxis: tutorials, how-to, reference, explanation)
 ocre-jelly.schema.json JSON Schema for the config
 setup.sh               install, check, uninstall
 ```
