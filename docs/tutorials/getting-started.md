@@ -2,14 +2,14 @@
 
 In this tutorial, you install ocre-jelly, audit a paragraph, rewrite it, and set up one repo with a locale. It takes about ten minutes.
 
-You need Claude Code, Python 3.10 or later, and read access to `https://git.nexapptech.com/vbernier/ocre-jelly`.
+You need Claude Code, Python 3.10 or later, and read access to `https://github.com/la-rockoteque/ocre-jelly`.
 
 ## 1. Install the plugin
 
 Run these two commands in a terminal:
 
 ```bash
-claude plugin marketplace add https://git.nexapptech.com/vbernier/ocre-jelly.git
+claude plugin marketplace add https://github.com/la-rockoteque/ocre-jelly.git
 claude plugin install ocre-jelly@ocre-jelly
 ```
 
