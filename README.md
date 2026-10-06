@@ -27,7 +27,7 @@ Requirements: Claude Code, Python 3.10 or later.
 ### For yourself (every repo)
 
 ```bash
-claude plugin marketplace add https://git.nexapptech.com/vbernier/ocre-jelly.git
+claude plugin marketplace add https://github.com/la-rockoteque/ocre-jelly.git
 claude plugin install ocre-jelly@ocre-jelly
 ```
 
@@ -36,7 +36,7 @@ claude plugin install ocre-jelly@ocre-jelly
 Run this in the repo, then commit `.claude/settings.json`. Teammates are offered the plugin when they trust the folder.
 
 ```bash
-claude plugin marketplace add https://git.nexapptech.com/vbernier/ocre-jelly.git --scope project
+claude plugin marketplace add https://github.com/la-rockoteque/ocre-jelly.git --scope project
 claude plugin install ocre-jelly@ocre-jelly --scope project
 ```
 
@@ -52,7 +52,7 @@ Or ask Claude: "set ocre-jelly's locales to en-CA and fr-CA for this repo."
 ### From a clone
 
 ```bash
-git clone https://git.nexapptech.com/vbernier/ocre-jelly.git
+git clone https://github.com/la-rockoteque/ocre-jelly.git
 cd ocre-jelly
 ./setup.sh                  # user scope; --scope project|local also work. Offers the setup wizard at the end
 ./setup.sh --wizard --repo ~/dev/my-app   # install, then configure that repo without asking

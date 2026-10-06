@@ -36,7 +36,7 @@ python3 $OJ/update.py status
 
 ## Requirements
 
-- ocre-jelly installed from a marketplace with a git source: the server URL (`claude plugin marketplace add https://git.nexapptech.com/vbernier/ocre-jelly.git`), or a local clone. From a local clone, "main" means the clone's own `main`. Pull or commit there, and the check sees it.
+- ocre-jelly installed from a marketplace with a git source: the server URL (`claude plugin marketplace add https://github.com/la-rockoteque/ocre-jelly.git`), or a local clone. From a local clone, "main" means the clone's own `main`. Pull or commit there, and the check sees it.
 - Read access to the repo without a password prompt: a credential helper or an SSH key. Without one, the check fails quietly, and `update.py status` shows the error.
 
 ## Team rules
@@ -56,7 +56,7 @@ python3 $OJ/update.py status
 ```
 mode: prompt (branch main, check every 24 h)
 installed: 0.1.0 (b4019b0)
-marketplace source: {"source": "git", "url": "https://git.nexapptech.com/vbernier/ocre-jelly.git"}, native auto-update: off
+marketplace source: {"source": "git", "url": "https://github.com/la-rockoteque/ocre-jelly.git"}, native auto-update: off
 last check: 2026-09-28T12:18:04+00:00 (latest ca767f4)
 update available: b4019b0 -> ca767f4
 ```

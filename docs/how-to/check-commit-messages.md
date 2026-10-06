@@ -76,7 +76,7 @@ In the target repo's `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-  - repo: https://git.nexapptech.com/vbernier/ocre-jelly.git
+  - repo: https://github.com/la-rockoteque/ocre-jelly.git
     rev: v0.1.0
     hooks:
       - id: ocre-jelly-commit-msg

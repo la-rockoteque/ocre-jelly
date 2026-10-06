@@ -7,7 +7,7 @@ This guide makes ocre-jelly part of a repo, so every teammate gets the same plug
 In the repo root, run:
 
 ```bash
-claude plugin marketplace add https://git.nexapptech.com/vbernier/ocre-jelly.git --scope project
+claude plugin marketplace add https://github.com/la-rockoteque/ocre-jelly.git --scope project
 claude plugin install ocre-jelly@ocre-jelly --scope project
 ```
 
@@ -33,7 +33,7 @@ python3 $OJ/modules.py enable conventional-commits --project
 You can also edit the file by hand. [Configuration](../reference/configuration.md) lists every key. For editor completion, add the schema reference at the top of the file:
 
 ```json
-{ "$schema": "https://git.nexapptech.com/vbernier/ocre-jelly/raw/branch/main/ocre-jelly.schema.json" }
+{ "$schema": "https://raw.githubusercontent.com/la-rockoteque/ocre-jelly/main/ocre-jelly.schema.json" }
 ```
 
 Check the raw-file URL format on your git server: Gitea uses `/raw/branch/main/`, and GitLab uses `/-/raw/main/`.
